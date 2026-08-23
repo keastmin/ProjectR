@@ -16,6 +16,9 @@ public class PlayerBasicAttack4State : PlayerStateBase
 
     public override void Enter()
     {
+        Vector3 targetDirection = Core.DirCalculator.GetTargetDirection(Core.InputCollector.MoveValue, Core.MainCamera.transform);
+        Core.Rotator.RotateImmediately(targetDirection);
+
         _isCanOtherBehaviour = false;
         _isCanNextBasicAttack = false;
         Core.AnimationEvent.OnEnableNextBasicAttack += EnableNextAttack;
@@ -31,7 +34,8 @@ public class PlayerBasicAttack4State : PlayerStateBase
         // 기본 공격 입력이 있다면 다음 공격으로 전환
         if (_isCanNextBasicAttack && Core.InputCollector.IsInputAttack)
         {
-            Core.StateMachine.Transition(Core.StateMachine.BasicAttack1State, "IsBasicAttack");
+            // Core.StateMachine.Transition(Core.StateMachine.BasicAttack1State, "IsBasicAttack");
+            Core.StateMachine.Transition(Core.StateMachine.BasicAttack1State);
             return;
         }
 

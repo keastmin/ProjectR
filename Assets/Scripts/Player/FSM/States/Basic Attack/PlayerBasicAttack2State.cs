@@ -16,6 +16,9 @@ public class PlayerBasicAttack2State : PlayerStateBase
 
     public override void Enter()
     {
+        Vector3 targetDirection = Core.DirCalculator.GetTargetDirection(Core.InputCollector.MoveValue, Core.MainCamera.transform);
+        Core.Rotator.RotateImmediately(targetDirection);
+
         _isCanOtherBehaviour = false;
         _isCanNextBasicAttack = false;
         Core.AnimationEvent.OnEnableNextBasicAttack += EnableNextAttack;

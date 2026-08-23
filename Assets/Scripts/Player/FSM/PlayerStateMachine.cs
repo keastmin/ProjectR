@@ -5,7 +5,8 @@ public class PlayerStateMachine
     public PlayerIdleState IdleState;
     public PlayerRunStartState RunStartState;
     public PlayerRunLoopState RunLoopState;
-    public PlayerRunStopState RunStopState;
+    public PlayerRunStopLeftState RunStopLeftState;
+    public PlayerRunStopRightState RunStopRightState;
     public PlayerBasicAttack1State BasicAttack1State;
     public PlayerBasicAttack2State BasicAttack2State;
     public PlayerBasicAttack3State BasicAttack3State;
@@ -20,7 +21,8 @@ public class PlayerStateMachine
         IdleState = new PlayerIdleState(player);
         RunStartState = new PlayerRunStartState(player);
         RunLoopState = new PlayerRunLoopState(player);
-        RunStopState = new PlayerRunStopState(player);
+        RunStopLeftState = new PlayerRunStopLeftState(player);
+        RunStopRightState = new PlayerRunStopRightState(player);
         BasicAttack1State = new PlayerBasicAttack1State(player);
         BasicAttack2State = new PlayerBasicAttack2State(player);
         BasicAttack3State = new PlayerBasicAttack3State(player);

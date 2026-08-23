@@ -11,7 +11,7 @@ public class PlayerRunLoopState : PlayerStateBase
 
     public override void Enter()
     {
-        Debug.Log("달리기 유지");
+        Core.Animator.SetTrigger("IsRunLoop");
         _animDeltaPos = Vector3.zero;
     }
 
@@ -23,14 +23,18 @@ public class PlayerRunLoopState : PlayerStateBase
         // 기본 공격 입력이 있다면 기본 공격 상태로 전환
         if (Core.InputCollector.IsInputAttack)
         {
-            Core.StateMachine.Transition(Core.StateMachine.BasicAttack1State, "IsBasicAttack");
+            Core.StateMachine.Transition(Core.StateMachine.BasicAttack1State);
             return;
         }
 
         // 이동 입력이 없다면 달리기 종료
         if (!Core.InputCollector.IsInputMove)
         {
-            Core.StateMachine.Transition(Core.StateMachine.RunStopState, "IsRunStop");
+            FrontFoot currentFrontFoot = Core.FootPosDetector.GetCurrentFrontFoot();
+            if (currentFrontFoot == FrontFoot.LeftFoot)
+                Core.StateMachine.Transition(Core.StateMachine.RunStopLeftState);
+            else
+                Core.StateMachine.Transition(Core.StateMachine.RunStopRightState);
             return;
         }
     }

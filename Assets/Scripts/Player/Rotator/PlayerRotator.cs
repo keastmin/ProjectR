@@ -37,4 +37,13 @@ public class PlayerRotator : MonoBehaviour
         Quaternion targetRotation = Quaternion.LookRotation(direction, Vector3.up);
         _facingRotation = Quaternion.RotateTowards(_facingRotation, targetRotation, _rotationTowardSpeed * Time.deltaTime);
     }
+
+    public void RotateImmediately(Vector3 direction)
+    {
+        if (direction.sqrMagnitude <= 0.001f)
+            return;
+
+        _facingRotation = Quaternion.LookRotation(direction, Vector3.up);
+        _modelTransform.rotation = _facingRotation;
+    }
 }
