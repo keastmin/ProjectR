@@ -40,38 +40,6 @@ public class AttackDamageField
         return Array.Empty<Collider>();
     }
 
-    public void DrawGizmo(Color color)
-    {
-        if (_hitbox == null)
-            return;
-
-        Matrix4x4 previousMatrix = Gizmos.matrix;
-        Color previousColor = Gizmos.color;
-        Gizmos.color = color;
-
-        if (_hitbox is BoxCollider box)
-        {
-            Gizmos.matrix = box.transform.localToWorldMatrix;
-            Gizmos.DrawWireCube(box.center, box.size);
-        }
-        else if (_hitbox is SphereCollider sphere)
-        {
-            Gizmos.matrix = Matrix4x4.identity;
-            Gizmos.DrawWireSphere(sphere.transform.TransformPoint(sphere.center), GetSphereRadius(sphere));
-        }
-        else if (_hitbox is CapsuleCollider capsule)
-        {
-            GetCapsuleWorldShape(capsule, out Vector3 pointA, out Vector3 pointB, out float radius);
-            Gizmos.matrix = Matrix4x4.identity;
-            Gizmos.DrawWireSphere(pointA, radius);
-            Gizmos.DrawWireSphere(pointB, radius);
-            Gizmos.DrawLine(pointA, pointB);
-        }
-
-        Gizmos.matrix = previousMatrix;
-        Gizmos.color = previousColor;
-    }
-
     private Collider[] DetectBox(BoxCollider box)
     {
         Vector3 halfExtents = Vector3.Scale(box.size, Abs(box.transform.lossyScale)) * 0.5f;

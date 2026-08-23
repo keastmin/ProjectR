@@ -38,4 +38,9 @@ public class PlayerIdleState : PlayerStateBase
     {
         
     }
+
+    public override void Exit()
+    {
+        Core.Animator.ResetTrigger("IsIdle");
+    }
 }
