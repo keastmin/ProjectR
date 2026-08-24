@@ -9,6 +9,8 @@ public class PlayerRunStartState : PlayerStateBase
     private Vector3 _animDeltaPos;
     private int _animHash;
 
+    private bool _isQuickTurn = true;
+
     public PlayerRunStartState(PlayerCore player) : base(player)
     {
         _animHash = Animator.StringToHash("Base Layer.Run." + _animName);
@@ -18,6 +20,9 @@ public class PlayerRunStartState : PlayerStateBase
     {
         Core.Animator.SetTrigger("IsRunStart");
         _animDeltaPos = Vector3.zero;
+
+        Core.AnimationEvent.OnDisableQuickTurn += HandleQuickTurnEvent;
+        _isQuickTurn = true;
     }
 
     public override void UpdateTick()
@@ -39,17 +44,7 @@ public class PlayerRunStartState : PlayerStateBase
         // 이동 입력이 없다면 달리기 종료
         if (!Core.InputCollector.IsInputMove)
         {
-            FrontFoot currentFrontFoot = Core.FootPosDetector.GetCurrentFrontFoot();
-            if (currentFrontFoot == FrontFoot.LeftFoot)
-            {
-                Core.StateMachine.Transition(Core.StateMachine.RunStopLeftState);
-                return;
-            }
-            else
-            {
-                Core.StateMachine.Transition(Core.StateMachine.RunStopRightState);
-                return;
-            }
+            Core.StateMachine.Transition(Core.StateMachine.IdleState);
         }
 
         // 애니메이션 종료까지 입력이 있다면 달리기 유지
@@ -74,11 +69,22 @@ public class PlayerRunStartState : PlayerStateBase
     public override void Exit()
     {
         _animDeltaPos = Vector3.zero;
+
+        Core.AnimationEvent.OnDisableQuickTurn -= HandleQuickTurnEvent;
+        _isQuickTurn = true;
     }
 
     private void Rotation()
     {
         Vector3 targetDirection = Core.DirCalculator.GetTargetDirection(Core.InputCollector.MoveValue, Core.MainCamera.transform);
-        Core.Rotator.RotateToward(targetDirection);
+        if (!_isQuickTurn)
+            Core.Rotator.RotateToward(targetDirection);
+        else
+            Core.Rotator.RotateToward(targetDirection, 360f * 4);
+    }
+
+    private void HandleQuickTurnEvent()
+    {
+        _isQuickTurn = false;
     }
 }

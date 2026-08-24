@@ -31,11 +31,16 @@ public class PlayerRotator : MonoBehaviour
 
     public void RotateToward(Vector3 direction)
     {
+        RotateToward(direction, _rotationTowardSpeed);
+    }
+
+    public void RotateToward(Vector3 direction, float rotationTowardSpeed)
+    {
         if (direction.sqrMagnitude <= 0.001f)
             return;
 
         Quaternion targetRotation = Quaternion.LookRotation(direction, Vector3.up);
-        _facingRotation = Quaternion.RotateTowards(_facingRotation, targetRotation, _rotationTowardSpeed * Time.deltaTime);
+        _facingRotation = Quaternion.RotateTowards(_facingRotation, targetRotation, rotationTowardSpeed * Time.deltaTime);
     }
 
     public void RotateImmediately(Vector3 direction)
