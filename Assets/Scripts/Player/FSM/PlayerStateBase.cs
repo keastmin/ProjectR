@@ -11,7 +11,7 @@ public class PlayerStateBase
 
     public virtual void Enter()
     {
-
+        Debug.Log("PlayerStateBase 진입");
     }
 
     public virtual void UpdateTick()

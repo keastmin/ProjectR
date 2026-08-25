@@ -3,6 +3,8 @@ using UnityEngine;
 public class PlayerRunLoopState : PlayerStateBase
 {
     private Vector3 _animDeltaPos;
+    private float _fastRunTransitionTime = 3f;
+    private float _currentStateTime = 0f;
 
     public PlayerRunLoopState(PlayerCore player) : base(player)
     {
@@ -11,19 +13,43 @@ public class PlayerRunLoopState : PlayerStateBase
 
     public override void Enter()
     {
-        Core.Animator.SetTrigger("IsRunLoop");
+        Debug.Log("PlayerRunLoopState 진입");
+        Debug.Log("달리기 루프");
+
+        // 초기화
         _animDeltaPos = Vector3.zero;
+        _currentStateTime = 0f;
+
+        // 애니메이션 재생
+        Core.Animator.SetTrigger("IsRunLoop");
     }
 
     public override void UpdateTick()
     {
+        // 상태 시간 누적
+        _currentStateTime += Time.deltaTime;
+
         // 회전
         Rotation();
+
+        // 회피 입력이 있으면 정면 회피로 전환
+        if (Core.InputCollector.IsInputDodge)
+        {
+            Core.StateMachine.Transition(Core.StateMachine.FrontDodgeState);
+            return;
+        }
 
         // 기본 공격 입력이 있다면 기본 공격 상태로 전환
         if (Core.InputCollector.IsInputAttack)
         {
             Core.StateMachine.Transition(Core.StateMachine.BasicAttack1State);
+            return;
+        }
+
+        // 상태 시간이 빠른 달리기 전환 시간 이상이면 빠른 달리기로 전환
+        if(_currentStateTime >= _fastRunTransitionTime)
+        {
+            Core.StateMachine.Transition(Core.StateMachine.FastRunLoopState);
             return;
         }
 
@@ -52,7 +78,9 @@ public class PlayerRunLoopState : PlayerStateBase
 
     public override void Exit()
     {
+        // 초기화
         _animDeltaPos = Vector3.zero;
+        _currentStateTime = 0f;
     }
 
     private void Rotation()

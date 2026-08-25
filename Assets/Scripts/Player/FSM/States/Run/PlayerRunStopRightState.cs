@@ -2,29 +2,37 @@ using UnityEngine;
 
 public class PlayerRunStopRightState : PlayerStateBase
 {
-    private string _rFootAnimName = "Run Stop R Foot";
-
-    private float _endAnimNormalTime = 0.99f;
-    private AnimatorStateInfo _stateInfo;
     private Vector3 _animDeltaPos;
-    private int _animHash;
+
+    private bool _isTransitionIdle = false;
 
     public PlayerRunStopRightState(PlayerCore player) : base(player)
     {
-        _animHash = Animator.StringToHash("Base Layer.Run." + _rFootAnimName);
+
     }
 
     public override void Enter()
     {
-        Core.Animator.SetTrigger("IsRunStopRight");
+        Debug.Log("PlayerRunStopRightState 진입");
+        // 이벤트 연결
+        Core.AnimationEvent.OnKeepNext += SetTransitionIdle;
+
+        // 초기화
         _animDeltaPos = Vector3.zero;
+        _isTransitionIdle = false;
+
+        // 애니메이션 재생
+        Core.Animator.SetTrigger("IsRunStopRight");
     }
 
     public override void UpdateTick()
     {
-        _stateInfo = Core.Animator.GetCurrentAnimatorStateInfo(0);
-        float currAnimNormalTime = _stateInfo.normalizedTime;
-        bool isRunStopState = _stateInfo.fullPathHash == _animHash;
+        // 회피 입력이 있다면 회피 백회피 시작
+        if (Core.InputCollector.IsInputDodge)
+        {
+            Core.StateMachine.Transition(Core.StateMachine.BackDodgeState);
+            return;
+        }
 
         // 기본 공격 입력이 있다면 기본 공격 상태로 전환
         if (Core.InputCollector.IsInputAttack)
@@ -41,7 +49,7 @@ public class PlayerRunStopRightState : PlayerStateBase
         }
 
         // 이동 입력이 없다면 달리기 종료
-        if (currAnimNormalTime >= _endAnimNormalTime && isRunStopState)
+        if (_isTransitionIdle)
         {
             Core.StateMachine.Transition(Core.StateMachine.IdleState);
             return;
@@ -61,6 +69,16 @@ public class PlayerRunStopRightState : PlayerStateBase
 
     public override void Exit()
     {
+        // 이벤트 해제
+        Core.AnimationEvent.OnKeepNext -= SetTransitionIdle;
+
+        // 초기화
         _animDeltaPos = Vector3.zero;
+        _isTransitionIdle = false;
+    }
+
+    private void SetTransitionIdle()
+    {
+        _isTransitionIdle = true;
     }
 }

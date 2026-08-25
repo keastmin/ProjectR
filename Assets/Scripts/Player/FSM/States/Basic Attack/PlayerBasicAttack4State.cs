@@ -17,6 +17,7 @@ public class PlayerBasicAttack4State : PlayerStateBase
 
     public override void Enter()
     {
+        Debug.Log("PlayerBasicAttack4State 진입");
         // 애니메이션 재생
         Core.Animator.SetTrigger("IsBasicAttack");
 

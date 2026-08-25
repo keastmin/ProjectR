@@ -2,37 +2,45 @@ using UnityEngine;
 
 public class PlayerRunStartState : PlayerStateBase
 {
-    private string _animName = "Run Start";
-
-    private float _endAnimNormalTime = 0.99f;
-    private AnimatorStateInfo _stateInfo;
     private Vector3 _animDeltaPos;
-    private int _animHash;
 
     private bool _isQuickTurn = true;
+    private bool _isTransitionRunLoop = false;
 
     public PlayerRunStartState(PlayerCore player) : base(player)
     {
-        _animHash = Animator.StringToHash("Base Layer.Run." + _animName);
+
     }
 
     public override void Enter()
     {
+        Debug.Log("PlayerRunStartState 진입");
+        Debug.Log("달리기 시작");
+        
+        // 초기화
+        _isQuickTurn = true;
+        _isTransitionRunLoop = false;
+
+        // 이벤트 연결
+        Core.AnimationEvent.OnDisableQuickTurn += HandleQuickTurnEvent;
+        Core.AnimationEvent.OnKeepNext += SetTransitionRunLoop;
+
         Core.Animator.SetTrigger("IsRunStart");
         _animDeltaPos = Vector3.zero;
 
-        Core.AnimationEvent.OnDisableQuickTurn += HandleQuickTurnEvent;
-        _isQuickTurn = true;
     }
 
     public override void UpdateTick()
     {
-        _stateInfo = Core.Animator.GetCurrentAnimatorStateInfo(0);
-        float currAnimNormalTime = _stateInfo.normalizedTime;
-        bool isRunStartState = _stateInfo.fullPathHash == _animHash;
-
         // 회전
         Rotation();
+
+        // 회피 입력이 있으면 정면 회피로 전환
+        if (Core.InputCollector.IsInputDodge)
+        {
+            Core.StateMachine.Transition(Core.StateMachine.FrontDodgeState);
+            return;
+        }
 
         // 기본 공격 입력이 있다면 기본 공격 상태로 전환
         if (Core.InputCollector.IsInputAttack)
@@ -48,7 +56,7 @@ public class PlayerRunStartState : PlayerStateBase
         }
 
         // 애니메이션 종료까지 입력이 있다면 달리기 유지
-        if(currAnimNormalTime >= _endAnimNormalTime && isRunStartState)
+        if (_isTransitionRunLoop)
         {
             Core.StateMachine.Transition(Core.StateMachine.RunLoopState);
             return;
@@ -68,10 +76,14 @@ public class PlayerRunStartState : PlayerStateBase
 
     public override void Exit()
     {
+        // 초기화
+        _isQuickTurn = true;
+        _isTransitionRunLoop = false;
         _animDeltaPos = Vector3.zero;
 
+        // 이벤트 해제
         Core.AnimationEvent.OnDisableQuickTurn -= HandleQuickTurnEvent;
-        _isQuickTurn = true;
+        Core.AnimationEvent.OnKeepNext -= SetTransitionRunLoop;
     }
 
     private void Rotation()
@@ -86,5 +98,10 @@ public class PlayerRunStartState : PlayerStateBase
     private void HandleQuickTurnEvent()
     {
         _isQuickTurn = false;
+    }
+
+    private void SetTransitionRunLoop()
+    {
+        _isTransitionRunLoop = true;
     }
 }

@@ -7,10 +7,15 @@ public class PlayerStateMachine
     public PlayerRunLoopState RunLoopState;
     public PlayerRunStopLeftState RunStopLeftState;
     public PlayerRunStopRightState RunStopRightState;
+    public PlayerFastRunLoopState FastRunLoopState;
+    public PlayerFastRunStopState FastRunStopState;
     public PlayerBasicAttack1State BasicAttack1State;
     public PlayerBasicAttack2State BasicAttack2State;
     public PlayerBasicAttack3State BasicAttack3State;
     public PlayerBasicAttack4State BasicAttack4State;
+    public PlayerFrontDodgeState FrontDodgeState;
+    public PlayerFrontDodgeStopState FrontDodgeStopState;
+    public PlayerBackDodgeState BackDodgeState;
 
     private PlayerStateBase _currentState;
     private Animator _playerAnimator;
@@ -23,10 +28,15 @@ public class PlayerStateMachine
         RunLoopState = new PlayerRunLoopState(player);
         RunStopLeftState = new PlayerRunStopLeftState(player);
         RunStopRightState = new PlayerRunStopRightState(player);
+        FastRunLoopState = new PlayerFastRunLoopState(player);
+        FastRunStopState = new PlayerFastRunStopState(player);
         BasicAttack1State = new PlayerBasicAttack1State(player);
         BasicAttack2State = new PlayerBasicAttack2State(player);
         BasicAttack3State = new PlayerBasicAttack3State(player);
         BasicAttack4State = new PlayerBasicAttack4State(player);
+        FrontDodgeState = new PlayerFrontDodgeState(player);
+        FrontDodgeStopState = new PlayerFrontDodgeStopState(player);
+        BackDodgeState = new PlayerBackDodgeState(player);
     }
 
     public void InitStateMachine(PlayerStateBase initState)

@@ -50,6 +50,9 @@ public class PlayerCore : MonoBehaviour
     private void Start()
     {
         StateMachine.InitStateMachine(StateMachine.IdleState);
+
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     private void Update()
