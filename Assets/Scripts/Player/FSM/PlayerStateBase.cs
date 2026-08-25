@@ -3,6 +3,7 @@ using UnityEngine;
 public class PlayerStateBase
 {
     protected PlayerCore Core;
+    protected Vector3 AnimDeltaPos = Vector3.zero;
 
     public PlayerStateBase(PlayerCore player)
     {

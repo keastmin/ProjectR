@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class PlayerRunLoopState : PlayerStateBase
 {
-    private Vector3 _animDeltaPos;
     private float _fastRunTransitionTime = 3f;
     private float _currentStateTime = 0f;
 
@@ -17,7 +16,6 @@ public class PlayerRunLoopState : PlayerStateBase
         Debug.Log("달리기 루프");
 
         // 초기화
-        _animDeltaPos = Vector3.zero;
         _currentStateTime = 0f;
 
         // 애니메이션 재생
@@ -67,19 +65,18 @@ public class PlayerRunLoopState : PlayerStateBase
 
     public override void FixedTick()
     {
-        Core.Mover.Move(Core.Rotator.FacingRotation * (_animDeltaPos / Time.fixedDeltaTime));
-        _animDeltaPos = Vector3.zero;
+        Core.Mover.Move(Core.Rotator.FacingRotation * (AnimDeltaPos / Time.fixedDeltaTime));
+        AnimDeltaPos = Vector3.zero;
     }
 
     public override void AnimatorTick()
     {
-        _animDeltaPos += Core.Animator.deltaPosition;
+        AnimDeltaPos += Core.Animator.deltaPosition;
     }
 
     public override void Exit()
     {
         // 초기화
-        _animDeltaPos = Vector3.zero;
         _currentStateTime = 0f;
     }
 

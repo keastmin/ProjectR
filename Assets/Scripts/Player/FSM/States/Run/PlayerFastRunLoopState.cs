@@ -2,8 +2,6 @@ using UnityEngine;
 
 public class PlayerFastRunLoopState : PlayerStateBase
 {
-    private Vector3 _animDeltaPos = Vector3.zero;
-
     public PlayerFastRunLoopState(PlayerCore player) : base(player)
     {
 
@@ -12,8 +10,6 @@ public class PlayerFastRunLoopState : PlayerStateBase
     public override void Enter()
     {
         Debug.Log("PlayerFastRunLoopState 진입");
-        // 초기화
-        _animDeltaPos = Vector3.zero;
 
         // 애니메이션 재생
         Core.Animator.SetTrigger("IsFastRunLoop");
@@ -48,19 +44,18 @@ public class PlayerFastRunLoopState : PlayerStateBase
 
     public override void FixedTick()
     {
-        Core.Mover.Move(Core.Rotator.FacingRotation * (_animDeltaPos / Time.fixedDeltaTime));
-        _animDeltaPos = Vector3.zero;
+        Core.Mover.Move(Core.Rotator.FacingRotation * (AnimDeltaPos / Time.fixedDeltaTime));
+        AnimDeltaPos = Vector3.zero;
     }
 
     public override void AnimatorTick()
     {
-        _animDeltaPos += Core.Animator.deltaPosition;
+        AnimDeltaPos += Core.Animator.deltaPosition;
     }
 
     public override void Exit()
     {
-        // 초기화
-        _animDeltaPos = Vector3.zero;
+
     }
 
     private void Rotation()

@@ -2,8 +2,6 @@ using UnityEngine;
 
 public class PlayerFrontDodgeStopState : PlayerStateBase
 {
-    private Vector3 _animDeltaPos = Vector3.zero;
-
     private bool _isTransitionIdle = false;
 
     public PlayerFrontDodgeStopState(PlayerCore player) : base(player)
@@ -16,7 +14,6 @@ public class PlayerFrontDodgeStopState : PlayerStateBase
         Debug.Log("PlayerFrontDodgeStopState 진입");
         // 초기화
         _isTransitionIdle = false;
-        _animDeltaPos = Vector3.zero;
 
         // 이벤트 연결
         Core.AnimationEvent.OnKeepNext += SetTransitionIdle;
@@ -51,20 +48,19 @@ public class PlayerFrontDodgeStopState : PlayerStateBase
 
     public override void FixedTick()
     {
-        Core.Mover.Move(Core.Rotator.FacingRotation * (_animDeltaPos / Time.fixedDeltaTime));
-        _animDeltaPos = Vector3.zero;
+        Core.Mover.Move(Core.Rotator.FacingRotation * (AnimDeltaPos / Time.fixedDeltaTime));
+        AnimDeltaPos = Vector3.zero;
     }
 
     public override void AnimatorTick()
     {
-        _animDeltaPos += Core.Animator.deltaPosition;
+        AnimDeltaPos += Core.Animator.deltaPosition;
     }
 
     public override void Exit()
     {
         // 초기화
         _isTransitionIdle = false;
-        _animDeltaPos = Vector3.zero;
 
         // 이벤트 해제
         Core.AnimationEvent.OnKeepNext -= SetTransitionIdle;

@@ -5,8 +5,6 @@ public class PlayerBasicAttack2State : PlayerStateBase
 {
     private PlayableDirector _director;
 
-    private Vector3 _animDeltaPos = Vector3.zero;
-
     private bool _isNextComboEnable = false;
     private bool _isOtherBehaviourEnable = false;
 
@@ -65,13 +63,13 @@ public class PlayerBasicAttack2State : PlayerStateBase
 
     public override void FixedTick()
     {
-        Core.Mover.Move(Core.Rotator.FacingRotation * (_animDeltaPos / Time.fixedDeltaTime));
-        _animDeltaPos = Vector3.zero;
+        Core.Mover.Move(Core.Rotator.FacingRotation * (AnimDeltaPos / Time.fixedDeltaTime));
+        AnimDeltaPos = Vector3.zero;
     }
 
     public override void AnimatorTick()
     {
-        _animDeltaPos += Core.Animator.deltaPosition;
+        AnimDeltaPos += Core.Animator.deltaPosition;
     }
 
     public override void Exit()
@@ -82,8 +80,6 @@ public class PlayerBasicAttack2State : PlayerStateBase
 
         if (_director.state == PlayState.Playing)
             _director.Stop();
-
-        _animDeltaPos = Vector3.zero;
     }
 
     private void HandleNextComboEnableEvent()

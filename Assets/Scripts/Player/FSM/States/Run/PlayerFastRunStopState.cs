@@ -4,8 +4,6 @@ public class PlayerFastRunStopState : PlayerStateBase
 {
     private bool _isTransitionIdle = false;
 
-    private Vector3 _animDeltaPos = Vector3.zero;
-
     public PlayerFastRunStopState(PlayerCore player) : base(player)
     {
 
@@ -16,7 +14,6 @@ public class PlayerFastRunStopState : PlayerStateBase
         Debug.Log("PlayerFastRunStopState 진입");
         // 초기화
         _isTransitionIdle = false;
-        _animDeltaPos = Vector3.zero;
 
         // 이벤트 연결
         Core.AnimationEvent.OnTransitionIdle += SetTransitionIdle;
@@ -58,20 +55,19 @@ public class PlayerFastRunStopState : PlayerStateBase
 
     public override void FixedTick()
     {
-        Core.Mover.Move(Core.Rotator.FacingRotation * (_animDeltaPos / Time.fixedDeltaTime));
-        _animDeltaPos = Vector3.zero;
+        Core.Mover.Move(Core.Rotator.FacingRotation * (AnimDeltaPos / Time.fixedDeltaTime));
+        AnimDeltaPos = Vector3.zero;
     }
 
     public override void AnimatorTick()
     {
-        _animDeltaPos += Core.Animator.deltaPosition;
+        AnimDeltaPos += Core.Animator.deltaPosition;
     }
 
     public override void Exit()
     {
         // 초기화
         _isTransitionIdle = false;
-        _animDeltaPos = Vector3.zero;
 
         // 이벤트 해제
         Core.AnimationEvent.OnTransitionIdle -= SetTransitionIdle;

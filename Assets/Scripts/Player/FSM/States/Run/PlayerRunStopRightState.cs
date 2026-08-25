@@ -2,8 +2,6 @@ using UnityEngine;
 
 public class PlayerRunStopRightState : PlayerStateBase
 {
-    private Vector3 _animDeltaPos;
-
     private bool _isTransitionIdle = false;
 
     public PlayerRunStopRightState(PlayerCore player) : base(player)
@@ -18,7 +16,6 @@ public class PlayerRunStopRightState : PlayerStateBase
         Core.AnimationEvent.OnKeepNext += SetTransitionIdle;
 
         // 초기화
-        _animDeltaPos = Vector3.zero;
         _isTransitionIdle = false;
 
         // 애니메이션 재생
@@ -58,13 +55,13 @@ public class PlayerRunStopRightState : PlayerStateBase
 
     public override void FixedTick()
     {
-        Core.Mover.Move(Core.Rotator.FacingRotation * (_animDeltaPos / Time.fixedDeltaTime));
-        _animDeltaPos = Vector3.zero;
+        Core.Mover.Move(Core.Rotator.FacingRotation * (AnimDeltaPos / Time.fixedDeltaTime));
+        AnimDeltaPos = Vector3.zero;
     }
 
     public override void AnimatorTick()
     {
-        _animDeltaPos += Core.Animator.deltaPosition;
+        AnimDeltaPos += Core.Animator.deltaPosition;
     }
 
     public override void Exit()
@@ -73,7 +70,6 @@ public class PlayerRunStopRightState : PlayerStateBase
         Core.AnimationEvent.OnKeepNext -= SetTransitionIdle;
 
         // 초기화
-        _animDeltaPos = Vector3.zero;
         _isTransitionIdle = false;
     }
 

@@ -5,8 +5,6 @@ public class PlayerFrontDodgeState : PlayerStateBase
     private bool _isTransitionFrontDodgeStop = false;
     private bool _isTransitionFastRunLoop = false;
 
-    private Vector3 _animDeltaPos = Vector3.zero;
-
     public PlayerFrontDodgeState(PlayerCore player) : base(player)
     {
 
@@ -18,7 +16,6 @@ public class PlayerFrontDodgeState : PlayerStateBase
         // 초기화
         _isTransitionFrontDodgeStop = false;
         _isTransitionFastRunLoop = false;
-        _animDeltaPos = Vector3.zero;
 
         // 이벤트 연결
         Core.AnimationEvent.OnFrontDodgeStop += SetTransitionFrontDodgeStop;
@@ -51,13 +48,13 @@ public class PlayerFrontDodgeState : PlayerStateBase
 
     public override void FixedTick()
     {
-        Core.Mover.Move(Core.Rotator.FacingRotation * (_animDeltaPos / Time.fixedDeltaTime));
-        _animDeltaPos = Vector3.zero;
+        Core.Mover.Move(Core.Rotator.FacingRotation * (AnimDeltaPos / Time.fixedDeltaTime));
+        AnimDeltaPos = Vector3.zero;
     }
 
     public override void AnimatorTick()
     {
-        _animDeltaPos += Core.Animator.deltaPosition;
+        AnimDeltaPos += Core.Animator.deltaPosition;
     }
 
     public override void Exit()
@@ -65,7 +62,6 @@ public class PlayerFrontDodgeState : PlayerStateBase
         // 초기화
         _isTransitionFrontDodgeStop = false;
         _isTransitionFastRunLoop = false;
-        _animDeltaPos = Vector3.zero;
 
         // 이벤트 해제
         Core.AnimationEvent.OnFrontDodgeStop -= SetTransitionFrontDodgeStop;

@@ -5,8 +5,6 @@ public class PlayerBackDodgeState : PlayerStateBase
     private bool _isEnableOtherBehaviour = false;
     private bool _isTransitionIdle = false;
 
-    private Vector3 _animDeltaPos = Vector3.zero;
-
     public PlayerBackDodgeState(PlayerCore player) : base(player)
     {
 
@@ -18,7 +16,6 @@ public class PlayerBackDodgeState : PlayerStateBase
         // 초기화
         _isEnableOtherBehaviour = false;
         _isTransitionIdle = false;
-        _animDeltaPos = Vector3.zero;
 
         // 이벤트 연결
         Core.AnimationEvent.OnEnableOtherBehaviour += SetEnableOtherBehaviour;
@@ -60,13 +57,13 @@ public class PlayerBackDodgeState : PlayerStateBase
 
     public override void FixedTick()
     {
-        Core.Mover.Move(Core.Rotator.FacingRotation * (_animDeltaPos / Time.fixedDeltaTime));
-        _animDeltaPos = Vector3.zero;
+        Core.Mover.Move(Core.Rotator.FacingRotation * (AnimDeltaPos / Time.fixedDeltaTime));
+        AnimDeltaPos = Vector3.zero;
     }
 
     public override void AnimatorTick()
     {
-        _animDeltaPos += Core.Animator.deltaPosition;
+        AnimDeltaPos += Core.Animator.deltaPosition;
     }
 
     public override void Exit()
@@ -78,7 +75,6 @@ public class PlayerBackDodgeState : PlayerStateBase
         // 초기화
         _isEnableOtherBehaviour = false;
         _isTransitionIdle = false;
-        _animDeltaPos = Vector3.zero;
     }
 
     private void SetEnableOtherBehaviour()

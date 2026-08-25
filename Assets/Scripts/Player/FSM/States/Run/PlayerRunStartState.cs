@@ -2,8 +2,6 @@ using UnityEngine;
 
 public class PlayerRunStartState : PlayerStateBase
 {
-    private Vector3 _animDeltaPos;
-
     private bool _isQuickTurn = true;
     private bool _isTransitionRunLoop = false;
 
@@ -26,8 +24,6 @@ public class PlayerRunStartState : PlayerStateBase
         Core.AnimationEvent.OnKeepNext += SetTransitionRunLoop;
 
         Core.Animator.SetTrigger("IsRunStart");
-        _animDeltaPos = Vector3.zero;
-
     }
 
     public override void UpdateTick()
@@ -65,13 +61,13 @@ public class PlayerRunStartState : PlayerStateBase
 
     public override void FixedTick()
     {
-        Core.Mover.Move(Core.Rotator.FacingRotation * (_animDeltaPos / Time.fixedDeltaTime));
-        _animDeltaPos = Vector3.zero;
+        Core.Mover.Move(Core.Rotator.FacingRotation * (AnimDeltaPos / Time.fixedDeltaTime));
+        AnimDeltaPos = Vector3.zero;
     }
 
     public override void AnimatorTick()
     {
-        _animDeltaPos += Core.Animator.deltaPosition;
+        AnimDeltaPos += Core.Animator.deltaPosition;
     }
 
     public override void Exit()
@@ -79,7 +75,6 @@ public class PlayerRunStartState : PlayerStateBase
         // 초기화
         _isQuickTurn = true;
         _isTransitionRunLoop = false;
-        _animDeltaPos = Vector3.zero;
 
         // 이벤트 해제
         Core.AnimationEvent.OnDisableQuickTurn -= HandleQuickTurnEvent;
