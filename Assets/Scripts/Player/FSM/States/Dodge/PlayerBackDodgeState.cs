@@ -29,9 +29,13 @@ public class PlayerBackDodgeState : PlayerStateBase
     {
         if (_isEnableOtherBehaviour)
         {
+            // 회피 입력이 있다면 회피
             if (Core.InputCollector.IsInputDodge)
             {
-                Core.StateMachine.Transition(Core.StateMachine.BackDodgeState);
+                if (Core.InputCollector.IsInputMove)
+                    Core.StateMachine.Transition(Core.StateMachine.FrontDodgeState);
+                else
+                    Core.StateMachine.Transition(Core.StateMachine.BackDodgeState);
                 return;
             }
 

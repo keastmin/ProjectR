@@ -61,7 +61,10 @@ public class PlayerAttackInstanceContainer : MonoBehaviour
         {
             IDamageable damageable = hit.GetComponentInParent<IDamageable>();
             if (damageable != null && _damagedTargets.Add(damageable))
-                damageable.TakeDamage(damageField.Damage);
+            {
+                DamageData data = new DamageData(this.gameObject, damageField.Damage, damageField.HitStopFrame);
+                damageable.TakeDamage(data);
+            }
         }
     }
 
@@ -80,7 +83,10 @@ public class PlayerAttackInstanceContainer : MonoBehaviour
         {
             IDamageable damageable = hit.GetComponentInParent<IDamageable>();
             if (damageable != null)
-                damageable.TakeDamage(damageField.Damage);
+            {
+                DamageData data = new DamageData(this.gameObject, damageField.Damage, damageField.HitStopFrame);
+                damageable.TakeDamage(data);
+            }
         }
     }
 

@@ -28,7 +28,9 @@ public class PlayerBasicAttack2State : PlayerStateBase
         Core.AnimationEvent.OnEnableNextBasicAttack += HandleNextComboEnableEvent;
         Core.AnimationEvent.OnDisableNextBasicAttack += HandleNextComboDisableEvent;
 
-        Vector3 targetDirection = Core.DirCalculator.GetTargetDirection(Core.InputCollector.MoveValue, Core.MainCamera.transform);
+        Vector3 targetDirection = Core.TargetDetector.NearestEnemyCollider == null ?
+            Core.DirCalculator.GetTargetDirection(Core.InputCollector.MoveValue, Core.MainCamera.transform) :
+            Core.TargetDetector.NearestEnemyDirection;
         Core.Rotator.RotateImmediately(targetDirection);
     }
 
@@ -38,6 +40,16 @@ public class PlayerBasicAttack2State : PlayerStateBase
             Core.Animator.GetNextAnimatorStateInfo(0) :
             Core.Animator.GetCurrentAnimatorStateInfo(0);
         float normalizeTime = stateInfo.normalizedTime;
+
+        // 회피 입력이 있다면 회피
+        if (Core.InputCollector.IsInputDodge)
+        {
+            if (Core.InputCollector.IsInputMove)
+                Core.StateMachine.Transition(Core.StateMachine.FrontDodgeState);
+            else
+                Core.StateMachine.Transition(Core.StateMachine.BackDodgeState);
+            return;
+        }
 
         // 기본 공격 입력이 있다면 다음 공격으로 전환
         if (_isNextComboEnable && Core.InputCollector.IsInputAttack)

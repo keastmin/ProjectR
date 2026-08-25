@@ -7,11 +7,13 @@ public class AttackDamageField
     [SerializeField] private string _name = "Damage Field";
     [SerializeField] private Collider _hitbox;
     [SerializeField, Min(0f)] private float _damage = 10f;
+    [SerializeField, Min(0)] private int _hitStopFrame = 0;
     [SerializeField] private LayerMask _targetLayers = ~0;
     [SerializeField] private QueryTriggerInteraction _triggerInteraction = QueryTriggerInteraction.Collide;
 
     public string Name => _name;
     public float Damage => _damage;
+    public int HitStopFrame => _hitStopFrame;
 
     public void DisablePhysicalCollision()
     {

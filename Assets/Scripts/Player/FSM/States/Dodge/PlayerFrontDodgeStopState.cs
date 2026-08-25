@@ -31,6 +31,13 @@ public class PlayerFrontDodgeStopState : PlayerStateBase
             return;
         }
 
+        // 기본 공격 입력이 있다면 기본 공격으로 전환
+        if (Core.InputCollector.IsInputAttack)
+        {
+            Core.StateMachine.Transition(Core.StateMachine.BasicAttack1State);
+            return;
+        }
+
         // 이동 입력이 있으면 달리기 시작으로 전환
         if (Core.InputCollector.IsInputMove)
         {

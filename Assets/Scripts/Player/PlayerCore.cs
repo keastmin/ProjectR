@@ -14,6 +14,7 @@ public class PlayerCore : MonoBehaviour
     private PlayerAnimationEvent _animationEvent;
     private FootPositionDetector _footPositionDetector;
     private PlayerAttackInstanceContainer _attackInstanceContainer;
+    private PlayerTargetDetector _targetDetector;
 
     // 기능
     private PlayerStateMachine _stateMachine;
@@ -29,6 +30,7 @@ public class PlayerCore : MonoBehaviour
     public PlayerAnimationEvent AnimationEvent => _animationEvent;
     public FootPositionDetector FootPosDetector => _footPositionDetector;
     public PlayerAttackInstanceContainer AttackInstanceContainer => _attackInstanceContainer;
+    public PlayerTargetDetector TargetDetector => _targetDetector;
     public PlayerStateMachine StateMachine => _stateMachine;
     public DirectionCalculator DirCalculator => _dirCalculator;
 
@@ -43,6 +45,7 @@ public class PlayerCore : MonoBehaviour
         TryGetComponent(out _animationEvent);
         TryGetComponent(out _footPositionDetector);
         TryGetComponent(out _attackInstanceContainer);
+        TryGetComponent(out _targetDetector);
         _stateMachine = new PlayerStateMachine(this);
         _dirCalculator = new DirectionCalculator();
     }
