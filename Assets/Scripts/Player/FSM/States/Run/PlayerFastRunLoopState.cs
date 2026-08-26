@@ -27,10 +27,10 @@ public class PlayerFastRunLoopState : PlayerStateBase
             return;
         }
 
-        // 기본 공격 입력이 있으면 기본 공격으로 전환
+        // 공격 입력이 있으면 달리기 공격으로 전환
         if (Core.InputCollector.IsInputAttack)
         {
-            Core.StateMachine.Transition(Core.StateMachine.BasicAttack1State);
+            Core.StateMachine.Transition(Core.StateMachine.RunAttackState);
             return;
         }
 

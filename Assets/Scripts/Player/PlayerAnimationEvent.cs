@@ -11,6 +11,8 @@ public class PlayerAnimationEvent : MonoBehaviour
     public event Action OnTransitionIdle;
     public event Action OnFrontDodgeStop;
     public event Action OnTransitionFastRunLoop;
+    public event Action OnRunAttackEnableOtherBehaviour; // Run Attack 다음 행동 가능 이벤트
+    public event Action OnRunAttackEnd; // Run Attack 종료 이벤트
 
     // 다음 기본 공격 가능 이벤트 발동
     public void OnEnableNextBasicAttackActionInvoke()
@@ -58,5 +60,17 @@ public class PlayerAnimationEvent : MonoBehaviour
     public void OnKeepNextActionInvoke()
     {
         OnKeepNext?.Invoke();
+    }
+
+    // Run Attack에서 다음 행동이 가능한 이벤트 발동
+    public void OnRunAttackEnableOtherBehaviourActionInvoke()
+    {
+        OnRunAttackEnableOtherBehaviour?.Invoke();
+    }
+
+    // Run Attack이 종료되는 이벤트 발동
+    public void OnRunAttackEndActionInvoke()
+    {
+        OnRunAttackEnd?.Invoke();
     }
 }

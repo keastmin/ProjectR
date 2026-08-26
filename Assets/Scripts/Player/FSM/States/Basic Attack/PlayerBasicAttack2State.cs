@@ -17,7 +17,7 @@ public class PlayerBasicAttack2State : PlayerStateBase
     {
         Debug.Log("PlayerBasicAttack2State 진입");
         // 애니메이션 재생
-        Core.Animator.SetTrigger("IsBasicAttack");
+        Core.Animator.SetTrigger("IsBasicAttackNext");
 
         // 타임 라인 재생
         _director.time = 0;
@@ -51,17 +51,21 @@ public class PlayerBasicAttack2State : PlayerStateBase
             return;
         }
 
-        // 기본 공격 입력이 있다면 다음 공격으로 전환
+        // 다음 콤보가 가능하고 기본 공격 입력이 있다면 다음 공격으로 전환
         if (_isNextComboEnable && Core.InputCollector.IsInputAttack)
         {
             Core.StateMachine.Transition(Core.StateMachine.BasicAttack3State);
             return;
         }
 
-        // 이동 입력이 있다면 달리기 시작으로 전환
-        if (_isOtherBehaviourEnable && Core.InputCollector.IsInputMove)
+        // 다른 행동이 가능할 때
+        if (_isOtherBehaviourEnable)
         {
-            Core.StateMachine.Transition(Core.StateMachine.RunStartState);
+            // 이동 입력이 있다면 달리기, 공격 입력이 있다면 1타로 전환
+            if (Core.InputCollector.IsInputAttack)
+                Core.StateMachine.Transition(Core.StateMachine.BasicAttack1State);
+            else if (Core.InputCollector.IsInputMove)
+                Core.StateMachine.Transition(Core.StateMachine.RunStartState);
             return;
         }
 

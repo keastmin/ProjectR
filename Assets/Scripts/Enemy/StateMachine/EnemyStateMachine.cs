@@ -2,11 +2,17 @@ using UnityEngine;
 
 public class EnemyStateMachine
 {
+    public EnemyIdleState IdleState;
+    public EnemyFrontHitState FrontHitState;
+    public EnemyBackHitState BackHitState;
+
     private EnemyStateBase _currentState;
 
     public EnemyStateMachine(EnemyCore enemy)
     {
-
+        IdleState = new EnemyIdleState(enemy);
+        FrontHitState = new EnemyFrontHitState(enemy);
+        BackHitState = new EnemyBackHitState(enemy);
     }
 
     public void InitEnemyStateMachine(EnemyStateBase initState)

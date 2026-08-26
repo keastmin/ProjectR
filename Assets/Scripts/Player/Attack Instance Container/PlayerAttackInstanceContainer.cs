@@ -7,6 +7,11 @@ public class PlayerAttackInstanceContainer : MonoBehaviour
     [SerializeField] private AttackDamageField _basicAttack2DamageField;
     [SerializeField] private AttackDamageField _basicAttack3DamageField;
     [SerializeField] private AttackDamageField _basicAttack4DamageField;
+    [SerializeField] private AttackDamageField _runAttack1HitDamageField;
+    [SerializeField] private AttackDamageField _runAttack2HitDamageField;
+
+    [SerializeField] private Transform _basicAttack2GroundCrackTransform;
+    [SerializeField] private ParticleSystem _basicAttack2GroundCrackParticle;
 
     private readonly HashSet<IDamageable> _damagedTargets = new();
 
@@ -20,6 +25,15 @@ public class PlayerAttackInstanceContainer : MonoBehaviour
     public void OnGiveDamageBasicAttack2()
     {
         GiveDamageFieldHashing(_basicAttack2DamageField);
+    }
+
+    // 기본 공격 2 바닥 크랙 파티클 생성
+    public void OnGroundCrackParticleBasicAttack2()
+    {
+        Vector3 pos = _basicAttack2GroundCrackTransform.position;
+        Quaternion rot = _basicAttack2GroundCrackTransform.rotation;
+        Instantiate(_basicAttack2GroundCrackParticle, pos, rot);
+        Debug.Log("호출");
     }
 
     // 기본 공격 3 해시하고 데미지 주기
@@ -41,9 +55,21 @@ public class PlayerAttackInstanceContainer : MonoBehaviour
     }
 
     // 기본 공격 4 해시하지 않고 데미지 주기
-    public void OnGiveDamageBasicAttack4NoHasing()
+    public void OnGiveDamageBasicAttack4NoHashing()
     {
         GiveDamageFieldNoHasing(_basicAttack4DamageField);
+    }
+
+    // 달리기 공격 1타 데미지 주기
+    public void OnGiveDamageRunAttack1HitNoHashing()
+    {
+        GiveDamageFieldNoHasing(_runAttack1HitDamageField);
+    }
+
+    // 달리기 공격 2타 데미지 주기
+    public void OnGiveDamageRunAttack2HitNoHashing()
+    {
+        GiveDamageFieldNoHasing(_runAttack2HitDamageField);
     }
 
     // 데미지를 주는 대상을 해쉬에 추가하면서 공격

@@ -31,6 +31,13 @@ public class PlayerFrontDodgeState : PlayerStateBase
 
     public override void UpdateTick()
     {
+        // 공격 입력이 있으면 달리기 공격으로 전환
+        if (Core.InputCollector.IsInputAttack)
+        {
+            Core.StateMachine.Transition(Core.StateMachine.RunAttackState);
+            return;
+        }
+
         // 회피 종료 플래그 타이밍에 이동 입력이 없으면 정면 회피 멈춤으로 전환
         if (_isTransitionFrontDodgeStop && !Core.InputCollector.IsInputMove)
         {

@@ -51,6 +51,15 @@ public class PlayerBackDodgeState : PlayerStateBase
                 return;
             }
         }
+        else
+        {
+            // 공격 입력이 있으면 달리기 공격으로 전환
+            if (Core.InputCollector.IsInputAttack)
+            {
+                Core.StateMachine.Transition(Core.StateMachine.RunAttackState);
+                return;
+            }
+        }
 
         if (_isTransitionIdle)
         {

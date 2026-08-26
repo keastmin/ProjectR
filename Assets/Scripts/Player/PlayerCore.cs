@@ -75,6 +75,18 @@ public class PlayerCore : MonoBehaviour
 
     private void OnAnimatorMove()
     {
+#if UNITY_EDITOR
+        // Timeline 편집 상태에서 스크럽할 때만
+        if (!Application.isPlaying)
+        {
+            if (_animator == null)
+                _animator = GetComponent<Animator>();
+
+            _animator.ApplyBuiltinRootMotion();
+            return;
+        }
+#endif
+
         StateMachine.AnimatorTick();
     }
 }
