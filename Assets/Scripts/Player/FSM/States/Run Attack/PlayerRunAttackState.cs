@@ -38,22 +38,29 @@ public class PlayerRunAttackState : PlayerStateBase
 
     public override void UpdateTick()
     {
-        // 다른 행동 가능 플래그가 활성화 되면
-        if(_isEnableOtherBehaviour)
+        // 회피 입력이 있다면 회피 상태로 전환
+        if (Core.InputCollector.IsInputDodge)
         {
-            if (Core.InputCollector.IsInputDodge)
-            {
+            if (Core.InputCollector.IsInputMove)
+                Core.StateMachine.Transition(Core.StateMachine.FrontDodgeState);
+            else
                 Core.StateMachine.Transition(Core.StateMachine.BackDodgeState);
-            }
+            return;
+        }
 
+        // 다른 행동 가능 플래그가 활성화 되면 공격이나 이동으로 전환
+        if (_isEnableOtherBehaviour)
+        {
             if (Core.InputCollector.IsInputAttack)
             {
                 Core.StateMachine.Transition(Core.StateMachine.BasicAttack1State);
+                return;
             }
 
             if(Core.InputCollector.IsInputMove)
             {
                 Core.StateMachine.Transition(Core.StateMachine.RunStartState);
+                return;
             }
         }
 

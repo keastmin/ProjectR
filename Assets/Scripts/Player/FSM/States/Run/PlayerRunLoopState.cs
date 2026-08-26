@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class PlayerRunLoopState : PlayerStateBase
 {
-    private float _fastRunTransitionTime = 3f;
+    private float _fastRunTransitionTime = 2f;
     private float _currentStateTime = 0f;
 
     public PlayerRunLoopState(PlayerCore player) : base(player)

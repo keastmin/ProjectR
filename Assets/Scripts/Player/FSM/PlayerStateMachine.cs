@@ -17,6 +17,7 @@ public class PlayerStateMachine
     public PlayerFrontDodgeStopState FrontDodgeStopState;
     public PlayerBackDodgeState BackDodgeState;
     public PlayerRunAttackState RunAttackState;
+    public PlayerFastRunTurnState FastRunTurnState;
 
     private PlayerStateBase _currentState;
     private Animator _playerAnimator;
@@ -39,6 +40,7 @@ public class PlayerStateMachine
         FrontDodgeStopState = new PlayerFrontDodgeStopState(player);
         BackDodgeState = new PlayerBackDodgeState(player);
         RunAttackState = new PlayerRunAttackState(player);
+        FastRunTurnState = new PlayerFastRunTurnState(player);
     }
 
     public void InitStateMachine(PlayerStateBase initState)

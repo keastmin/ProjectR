@@ -2,7 +2,12 @@ using UnityEngine;
 
 public class PlayerFastRunStopState : PlayerStateBase
 {
+    private const float FastRunTurnInputWindow = 0.15f;
+    private const float OppositeDirectionDotThreshold = -0.8f;
+
     private bool _isTransitionIdle = false;
+    private float _currentStateTime = 0f;
+    private Vector3 _runDirection = Vector3.forward;
 
     public PlayerFastRunStopState(PlayerCore player) : base(player)
     {
@@ -14,6 +19,10 @@ public class PlayerFastRunStopState : PlayerStateBase
         Debug.Log("PlayerFastRunStopState 진입");
         // 초기화
         _isTransitionIdle = false;
+        _currentStateTime = 0f;
+
+        // 빠른 달리기를 멈추기 직전에 이동하던 방향을 저장
+        _runDirection = Core.Rotator.FacingRotation * Vector3.forward;
 
         // 이벤트 연결
         Core.AnimationEvent.OnTransitionIdle += SetTransitionIdle;
@@ -24,6 +33,8 @@ public class PlayerFastRunStopState : PlayerStateBase
 
     public override void UpdateTick()
     {
+        _currentStateTime += Time.deltaTime;
+
         // 회피 입력이 있으면 뒤로 회피로 전환
         if (Core.InputCollector.IsInputDodge)
         {
@@ -37,6 +48,10 @@ public class PlayerFastRunStopState : PlayerStateBase
             Core.StateMachine.Transition(Core.StateMachine.BasicAttack1State);
             return;
         }
+
+        // 정지 직후 일정 시간 안에 반대 방향 입력이 들어오면 빠른 달리기 회전으로 전환
+        if (TryTransitionToFastRunTurn())
+            return;
 
         // 이동 입력이 있으면 달리기 시작으로 전환
         if (Core.InputCollector.IsInputMove)
@@ -68,6 +83,7 @@ public class PlayerFastRunStopState : PlayerStateBase
     {
         // 초기화
         _isTransitionIdle = false;
+        _currentStateTime = 0f;
 
         // 이벤트 해제
         Core.AnimationEvent.OnTransitionIdle -= SetTransitionIdle;
@@ -76,5 +92,22 @@ public class PlayerFastRunStopState : PlayerStateBase
     private void SetTransitionIdle()
     {
         _isTransitionIdle = true;
+    }
+
+    private bool TryTransitionToFastRunTurn()
+    {
+        if (_currentStateTime > FastRunTurnInputWindow || !Core.InputCollector.IsInputMove)
+            return false;
+
+        Vector3 inputDirection = Core.DirCalculator.GetTargetDirection(
+            Core.InputCollector.MoveValue,
+            Core.MainCamera.transform);
+
+        bool isOppositeDirection = Vector3.Dot(_runDirection, inputDirection) <= OppositeDirectionDotThreshold;
+        if (!isOppositeDirection)
+            return false;
+
+        Core.StateMachine.Transition(Core.StateMachine.FastRunTurnState);
+        return true;
     }
 }
