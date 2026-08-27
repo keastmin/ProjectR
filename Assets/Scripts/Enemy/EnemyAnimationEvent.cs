@@ -3,16 +3,10 @@ using UnityEngine;
 
 public class EnemyAnimationEvent : MonoBehaviour
 {
-    public event Action OnFrontHitEnd;
-    public event Action OnBackHitEnd;
+    public event Action<AnimationEvent> OnAnimationEnd;
 
-    public void FrontHitEnd()
+    public void AnimationEndActionInvoke(AnimationEvent animationEvent)
     {
-        OnFrontHitEnd?.Invoke();
-    }
-
-    public void BackHitEnd()
-    {
-        OnBackHitEnd?.Invoke();
+        OnAnimationEnd?.Invoke(animationEvent);
     }
 }

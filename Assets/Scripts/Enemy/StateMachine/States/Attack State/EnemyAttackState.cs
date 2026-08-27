@@ -1,14 +1,13 @@
 using UnityEngine;
 
-public class EnemyBackHitState : EnemyStateBase
+public abstract class EnemyAttackState : EnemyStateBase
 {
-    private static readonly int HitStateHash = Animator.StringToHash("Base Layer.Hit.Hit Back");
+    protected abstract string AnimationTrigger { get; }
 
     private bool _isTransitionIdle = false;
     private bool _isDamaged = false;
-    private DamageData _damageData;
 
-    public EnemyBackHitState(EnemyCore enemy) : base(enemy)
+    public EnemyAttackState(EnemyCore core) : base(core)
     {
 
     }
@@ -19,18 +18,12 @@ public class EnemyBackHitState : EnemyStateBase
         _isTransitionIdle = false;
         _isDamaged = false;
 
-        // 데미지 데이터 캐싱
-        _damageData = Core.LastDamageData;
-
-        // 즉시 회전
-        Vector3 dir = Core.transform.position - _damageData.Sender.transform.position;
-        Core.Rotator.RotateImmediately(dir);
-
         // 이벤트 연결
-        Core.OnDamaged += SetDamaged;
         Core.AnimationEvent.OnAnimationEnd += SetTransitionIdle;
+        Core.OnDamaged += SetDamaged;
 
-        Core.PlayHitReaction(HitStateHash);
+        // 애니메이션 재생
+        Core.Animator.SetTrigger(AnimationTrigger);
     }
 
     public override void UpdateTick()
@@ -38,17 +31,22 @@ public class EnemyBackHitState : EnemyStateBase
         if (_isDamaged)
             return;
 
-        // Idle 전환 플래그가 활성화 되면 Idle로 전환
         if (_isTransitionIdle)
-        {
-            Core.StateMachine.Transition(Core.StateMachine.IdleState);
+        { 
+            EnemyStateBase nextState =
+                Core.TargetTransform != null
+                    ? Core.StateMachine.EngageState
+                    : Core.StateMachine.IdleState;
+
+            Core.StateMachine.Transition(nextState);
             return;
         }
     }
 
     public override void FixedTick()
     {
-        Core.Mover.Move(AnimDeltaPos / Time.fixedDeltaTime);
+        Vector3 velocity = AnimDeltaPos / Time.fixedDeltaTime;
+        Core.Mover.Move(velocity);
         AnimDeltaPos = Vector3.zero;
     }
 
@@ -64,22 +62,29 @@ public class EnemyBackHitState : EnemyStateBase
         _isDamaged = false;
 
         // 이벤트 해제
-        Core.OnDamaged -= SetDamaged;
         Core.AnimationEvent.OnAnimationEnd -= SetTransitionIdle;
-    }
+        Core.OnDamaged -= SetDamaged;
 
-    private void SetDamaged(DamageData data)
-    {
-        _isDamaged = true;
-        HitDirectionType type = HitDirectionCalculator.GetHitDirection(data, Core.transform.position, Core.Rotator.FacingDirection);
-        if (type == HitDirectionType.Front)
-            Core.StateMachine.Transition(Core.StateMachine.FrontHitState);
-        else if (type == HitDirectionType.Back)
-            Core.StateMachine.Transition(Core.StateMachine.BackHitState);
+        // 플래그 리셋
+        Core.Animator.ResetTrigger(AnimationTrigger);
+
+        // 공격 쿨타임 시작
+        Core.StartSlashAttackCooldown();
     }
 
     private void SetTransitionIdle(AnimationEvent animationEvent)
     {
         _isTransitionIdle = true;
+    }
+
+    private void SetDamaged(DamageData data)
+    {
+        _isDamaged = true;
+
+        HitDirectionType type = HitDirectionCalculator.GetHitDirection(data, Core.transform.position, Core.Rotator.FacingDirection);
+        if (type == HitDirectionType.Front)
+            Core.StateMachine.Transition(Core.StateMachine.FrontHitState);
+        else if (type == HitDirectionType.Back)
+            Core.StateMachine.Transition(Core.StateMachine.BackHitState);
     }
 }

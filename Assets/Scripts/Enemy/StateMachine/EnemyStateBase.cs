@@ -1,11 +1,11 @@
 using UnityEngine;
 
-public class EnemyStateBase
+public abstract class EnemyStateBase
 {
     protected EnemyCore Core;
     protected Vector3 AnimDeltaPos = Vector3.zero;
 
-    public EnemyStateBase(EnemyCore enemy)
+    protected EnemyStateBase(EnemyCore enemy)
     {
         Core = enemy;
     }
@@ -35,13 +35,13 @@ public class EnemyStateBase
 
     }
 
-    public void ClearAccumulatedMotion()
-    {
-        AnimDeltaPos = Vector3.zero;
-    }
-
     public virtual void Exit()
     {
 
+    }
+
+    public virtual void ClearAccumulatedMotion()
+    {
+        AnimDeltaPos = Vector3.zero;
     }
 }

@@ -28,7 +28,7 @@ public class EnemyFrontHitState : EnemyStateBase
 
         // 이벤트 연결
         Core.OnDamaged += SetDamaged;
-        Core.AnimationEvent.OnFrontHitEnd += SetTransitionIdle;
+        Core.AnimationEvent.OnAnimationEnd += SetTransitionIdle;
 
         Core.PlayHitReaction(HitStateHash);
     }
@@ -65,7 +65,7 @@ public class EnemyFrontHitState : EnemyStateBase
 
         // 이벤트 해제
         Core.OnDamaged -= SetDamaged;
-        Core.AnimationEvent.OnFrontHitEnd -= SetTransitionIdle;
+        Core.AnimationEvent.OnAnimationEnd -= SetTransitionIdle;
     }
 
     private void SetDamaged(DamageData data)
@@ -78,7 +78,7 @@ public class EnemyFrontHitState : EnemyStateBase
             Core.StateMachine.Transition(Core.StateMachine.BackHitState);
     }
 
-    private void SetTransitionIdle()
+    private void SetTransitionIdle(AnimationEvent animationEvent)
     {
         _isTransitionIdle = true;
     }

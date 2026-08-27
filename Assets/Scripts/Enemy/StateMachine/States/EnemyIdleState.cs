@@ -17,7 +17,6 @@ public class EnemyIdleState : EnemyStateBase
         // 이벤트 연결
         Core.OnDamaged += SetDamaged;
 
-
         Core.Animator.SetTrigger("IsIdle");
     }
 
@@ -25,6 +24,12 @@ public class EnemyIdleState : EnemyStateBase
     {
         if (_isDamaged)
             return;
+
+        if(Core.TargetTransform != null)
+        {
+            Core.StateMachine.Transition(Core.StateMachine.EngageState);
+            return;
+        }
     }
 
     public override void FixedTick()

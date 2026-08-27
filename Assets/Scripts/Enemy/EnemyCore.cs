@@ -3,6 +3,16 @@ using UnityEngine;
 
 public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
 {
+    [Header("Slash Attack")]
+    [SerializeField, Min(0f)]
+    private float _slashAttackRange = 2.5f;
+
+    [SerializeField, Range(0f, 180f)]
+    private float _slashAttackAngle = 30f;
+
+    [SerializeField, Min(0f)]
+    private float _slashAttackCooldown = 1.5f;
+
     [SerializeField, Min(0f)] private float _maxHP = 100f;
     [SerializeField] private float _currentHP;
 
@@ -14,17 +24,25 @@ public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
     private EnemyMover _mover;
     private EnemyAnimationEvent _animationEvent;
     private EnemyStateMachine _stateMachine;
+    private EnemyTargetDetector _targetDetector;
     private bool _isHitStopped;
     private float _animatorSpeedBeforeHitStop = 1f;
+    private float _nextSlashAttackTime;
 
+    public float SlashAttackRange => _slashAttackRange;
+    public float SlashAttackAngle => _slashAttackAngle;
+    public float SlashAttackCooldown => _slashAttackCooldown;
     public float CurrentHP => _currentHP;
     public Animator Animator => _animatorCallback.Animator;
     public EnemyRotator Rotator => _rotator;
     public EnemyMover Mover => _mover;
     public EnemyAnimationEvent AnimationEvent => _animationEvent;
     public EnemyStateMachine StateMachine => _stateMachine;
+    public EnemyTargetDetector TargetDetector => _targetDetector;
     public DamageData LastDamageData => _lastDamageData;
     public bool IsHitStopped => _isHitStopped;
+    public Transform TargetTransform => TargetDetector.TargetTransform;
+    public bool IsSlashAttackReady => Time.time >= _nextSlashAttackTime;
 
     public event Action<DamageData> OnDamaged;
 
@@ -33,6 +51,7 @@ public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
         TryGetComponent(out _rotator);
         TryGetComponent(out _mover);
         TryGetComponent(out _animationEvent);
+        TryGetComponent(out _targetDetector);
 
         _currentHP = _maxHP;
 
@@ -122,4 +141,9 @@ public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
         _mover.SetHitStopped(false);
     }
 
+    public void StartSlashAttackCooldown()
+    {
+        _nextSlashAttackTime =
+            Time.time + _slashAttackCooldown;
+    }
 }

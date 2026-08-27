@@ -3,6 +3,8 @@ using UnityEngine;
 public class EnemyStateMachine
 {
     public EnemyIdleState IdleState;
+    public EnemyEngageState EngageState;
+    public EnemySlashAttackState SlashAttackState;
     public EnemyFrontHitState FrontHitState;
     public EnemyBackHitState BackHitState;
 
@@ -11,6 +13,8 @@ public class EnemyStateMachine
     public EnemyStateMachine(EnemyCore enemy)
     {
         IdleState = new EnemyIdleState(enemy);
+        EngageState = new EnemyEngageState(enemy);
+        SlashAttackState = new EnemySlashAttackState(enemy);
         FrontHitState = new EnemyFrontHitState(enemy);
         BackHitState = new EnemyBackHitState(enemy);
     }

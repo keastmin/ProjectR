@@ -4,13 +4,8 @@ public class EnemyAnimationEventSender : MonoBehaviour
 {
     [SerializeField] private EnemyAnimationEvent _animEvent;
 
-    public void FrontHitEnd()
+    public void OnAnimationEnd(AnimationEvent animationEvent)
     {
-        _animEvent.FrontHitEnd();
-    }
-
-    public void BackHitEnd()
-    {
-        _animEvent.BackHitEnd();
+        _animEvent.AnimationEndActionInvoke(animationEvent);
     }
 }
