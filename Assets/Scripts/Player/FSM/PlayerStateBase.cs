@@ -35,6 +35,11 @@ public class PlayerStateBase
 
     }
 
+    public void ClearAccumulatedMotion()
+    {
+        AnimDeltaPos = Vector3.zero;
+    }
+
     public virtual void Exit()
     {
 

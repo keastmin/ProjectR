@@ -32,8 +32,7 @@ public class PlayerRunAttackState : PlayerStateBase
         Core.Animator.SetTrigger("IsRunAttack");
 
         // 타임라인 재생
-        _director.time = 0f;
-        _director.Play();
+        Core.DirectorContainer.Play(DirectorID.RunAttack);
     }
 
     public override void UpdateTick()

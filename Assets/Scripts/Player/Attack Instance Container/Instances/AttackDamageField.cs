@@ -7,7 +7,8 @@ public class AttackDamageField
     [SerializeField] private string _name = "Damage Field";
     [SerializeField] private Collider _hitbox;
     [SerializeField, Min(0f)] private float _damage = 10f;
-    [SerializeField, Min(0)] private int _hitStopFrame = 0;
+    [SerializeField, Min(0), Tooltip("60Hz 전투 프레임 기준 플레이어 히트스탑 길이입니다. 적은 자동으로 1프레임 더 정지합니다.")]
+    private int _hitStopFrame = 0;
     [SerializeField] private LayerMask _targetLayers = ~0;
     [SerializeField] private QueryTriggerInteraction _triggerInteraction = QueryTriggerInteraction.Collide;
 

@@ -13,6 +13,8 @@ public class PlayerMover : MonoBehaviour
     private CapsuleCollider _capsuleCollider;
 
     private Vector3 _inputVelocity = Vector3.zero;
+    private bool _isHitStopped;
+    private RigidbodyConstraints _constraintsBeforeHitStop;
 
     #region MonoBehaviour
 
@@ -29,8 +31,20 @@ public class PlayerMover : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (_isHitStopped)
+        {
+            _rigidbody.linearVelocity = Vector3.zero;
+            _inputVelocity = Vector3.zero;
+            return;
+        }
+
         ApplyVelocity(_inputVelocity);
         UpdateCleanup();
+    }
+
+    private void OnDisable()
+    {
+        SetHitStopped(false);
     }
 
     #endregion
@@ -39,7 +53,30 @@ public class PlayerMover : MonoBehaviour
 
     public void Move(Vector3 velocity)
     {
+        if (_isHitStopped)
+            return;
+
         _inputVelocity = velocity;
+    }
+
+    public void SetHitStopped(bool stopped)
+    {
+        if (_isHitStopped == stopped)
+            return;
+
+        _isHitStopped = stopped;
+        _inputVelocity = Vector3.zero;
+        _rigidbody.linearVelocity = Vector3.zero;
+
+        if (stopped)
+        {
+            _constraintsBeforeHitStop = _rigidbody.constraints;
+            _rigidbody.constraints = RigidbodyConstraints.FreezeAll;
+        }
+        else
+        {
+            _rigidbody.constraints = _constraintsBeforeHitStop;
+        }
     }
 
     #endregion

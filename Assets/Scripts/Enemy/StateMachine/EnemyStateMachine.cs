@@ -41,6 +41,11 @@ public class EnemyStateMachine
         _currentState?.AnimatorTick();
     }
 
+    public void ClearAccumulatedMotion()
+    {
+        _currentState?.ClearAccumulatedMotion();
+    }
+
     public void Transition(EnemyStateBase nextState)
     {
         _currentState?.Exit();

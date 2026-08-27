@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class EnemyFrontHitState : EnemyStateBase
 {
+    private static readonly int HitStateHash = Animator.StringToHash("Base Layer.Hit.Hit Front");
+
     private bool _isTransitionIdle = false;
     private bool _isDamaged = false;
     private DamageData _damageData;
@@ -28,7 +30,7 @@ public class EnemyFrontHitState : EnemyStateBase
         Core.OnDamaged += SetDamaged;
         Core.AnimationEvent.OnFrontHitEnd += SetTransitionIdle;
 
-        Core.Animator.SetTrigger("IsFrontHit");
+        Core.PlayHitReaction(HitStateHash);
     }
 
     public override void UpdateTick()

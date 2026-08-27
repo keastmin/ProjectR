@@ -69,6 +69,11 @@ public class PlayerStateMachine
         _currentState?.AnimatorTick();
     }
 
+    public void ClearAccumulatedMotion()
+    {
+        _currentState?.ClearAccumulatedMotion();
+    }
+
     public void Transition(PlayerStateBase nextState, string paramName)
     {
         _playerAnimator.SetTrigger(paramName);

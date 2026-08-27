@@ -7,7 +7,7 @@ public class EnemyAnimatorCallback : MonoBehaviour
     private Animator _animator;
 
     public event Action OnAnimatorMoveAction;
-    public Animator Animator;
+    public Animator Animator => _animator;
 
     private void Awake()
     {

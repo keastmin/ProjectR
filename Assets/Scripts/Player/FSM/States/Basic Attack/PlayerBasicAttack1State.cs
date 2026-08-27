@@ -20,8 +20,7 @@ public class PlayerBasicAttack1State : PlayerStateBase
         Core.Animator.SetTrigger("IsBasicAttackStart");
 
         // 타임 라인 재생
-        _director.time = 0;
-        _director.Play();
+        Core.DirectorContainer.Play(DirectorID.BasicAttack1);
 
         _isNextComboEnable = false;
         _isOtherBehaviourEnable = false;

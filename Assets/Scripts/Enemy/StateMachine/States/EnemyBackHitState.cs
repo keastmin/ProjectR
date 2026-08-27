@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class EnemyBackHitState : EnemyStateBase
 {
+    private static readonly int HitStateHash = Animator.StringToHash("Base Layer.Hit.Hit Back");
+
     private bool _isTransitionIdle = false;
     private bool _isDamaged = false;
     private DamageData _damageData;
@@ -28,7 +30,7 @@ public class EnemyBackHitState : EnemyStateBase
         Core.OnDamaged += SetDamaged;
         Core.AnimationEvent.OnBackHitEnd += SetTransitionIdle;
 
-        Core.Animator.SetTrigger("IsBackHit");
+        Core.PlayHitReaction(HitStateHash);
     }
 
     public override void UpdateTick()

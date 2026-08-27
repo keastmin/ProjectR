@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class EnemyCore : MonoBehaviour, IDamageable
+public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
 {
     [SerializeField, Min(0f)] private float _maxHP = 100f;
     [SerializeField] private float _currentHP;
@@ -14,6 +14,8 @@ public class EnemyCore : MonoBehaviour, IDamageable
     private EnemyMover _mover;
     private EnemyAnimationEvent _animationEvent;
     private EnemyStateMachine _stateMachine;
+    private bool _isHitStopped;
+    private float _animatorSpeedBeforeHitStop = 1f;
 
     public float CurrentHP => _currentHP;
     public Animator Animator => _animatorCallback.Animator;
@@ -22,6 +24,7 @@ public class EnemyCore : MonoBehaviour, IDamageable
     public EnemyAnimationEvent AnimationEvent => _animationEvent;
     public EnemyStateMachine StateMachine => _stateMachine;
     public DamageData LastDamageData => _lastDamageData;
+    public bool IsHitStopped => _isHitStopped;
 
     public event Action<DamageData> OnDamaged;
 
@@ -44,31 +47,79 @@ public class EnemyCore : MonoBehaviour, IDamageable
 
     private void Update()
     {
+        if (_isHitStopped)
+            return;
+
         StateMachine.UpdateTick();
     }
 
     private void FixedUpdate()
     {
+        if (_isHitStopped)
+            return;
+
         StateMachine.FixedTick();
     }
 
     private void LateUpdate()
     {
+        if (_isHitStopped)
+            return;
+
         StateMachine.LateTick();
     }
 
     private void AnimatorUpdate()
     {
+        if (_isHitStopped)
+            return;
+
         StateMachine.AnimatorTick();
     }
 
-    public void TakeDamage(DamageData damageData)
+    private void OnDisable()
+    {
+        EndHitStop();
+    }
+
+    public bool TryTakeDamage(DamageData damageData)
     {
         if (damageData.DamageAmount <= 0f || _currentHP <= 0f)
-            return;
+            return false;
 
         _currentHP = Mathf.Max(_currentHP - damageData.DamageAmount, 0f);
         _lastDamageData = damageData;
         OnDamaged?.Invoke(damageData);
+        return true;
     }
+
+    public void PlayHitReaction(int stateHash)
+    {
+        Animator.Play(stateHash, 0, 0f);
+        Animator.Update(0f);
+    }
+
+    public void BeginHitStop()
+    {
+        if (_isHitStopped)
+            return;
+
+        _isHitStopped = true;
+        _stateMachine.ClearAccumulatedMotion();
+        _mover.SetHitStopped(true);
+
+        _animatorSpeedBeforeHitStop = Animator.speed;
+        Animator.speed = 0f;
+    }
+
+    public void EndHitStop()
+    {
+        if (!_isHitStopped)
+            return;
+
+        _isHitStopped = false;
+        Animator.speed = _animatorSpeedBeforeHitStop;
+        _mover.SetHitStopped(false);
+    }
+
 }
