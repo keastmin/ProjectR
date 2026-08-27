@@ -3,6 +3,13 @@ using UnityEngine;
 
 public class PlayerAnimationEvent : MonoBehaviour
 {
+    [SerializeField] private Transform _leftFootDashTransform;
+    [SerializeField] private Transform _rightFootDashTransform;
+    [SerializeField] private ParticleSystem _dashExplosionParticle;
+    [SerializeField] private Transform _dashWindTransform;
+    [SerializeField] private ParticleSystem _dashWindParicle;
+    [SerializeField] private LayerMask _groundLayer;
+
     public event Action OnEnableNextBasicAttack;
     public event Action OnDisableNextBasicAttack;
     public event Action OnDisableQuickTurn;
@@ -79,5 +86,34 @@ public class PlayerAnimationEvent : MonoBehaviour
     public void OnFastRunTurnEndActionInvoke()
     {
         OnFastRunTurnEnd?.Invoke();
+    }
+
+    public void OnDashExplosionEffectBoth()
+    {
+        OnDashExplosionEffectLeft();
+        OnDashExplosionEffectRight();
+    }
+
+    public void OnDashExplosionEffectLeft()
+    {
+        Vector3 leftPos = _leftFootDashTransform.position;
+        if (Physics.Raycast(leftPos, Vector3.down, out RaycastHit hit, 10f, _groundLayer))
+            leftPos = hit.point;
+        Instantiate(_dashExplosionParticle, leftPos, Quaternion.identity);
+    }
+
+    public void OnDashExplosionEffectRight()
+    {
+        Vector3 rightPos = _rightFootDashTransform.position;
+        if (Physics.Raycast(rightPos, Vector3.down, out RaycastHit hit, 10f, _groundLayer))
+            rightPos = hit.point;
+        Instantiate(_dashExplosionParticle, rightPos, Quaternion.identity);
+    }
+
+    public void OnDashWindEffect()
+    {
+        Vector3 pos = _dashWindTransform.position;
+        Quaternion rot = _dashWindTransform.rotation;
+        Instantiate(_dashWindParicle, pos, rot);
     }
 }
