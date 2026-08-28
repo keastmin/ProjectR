@@ -78,8 +78,7 @@ public class PlayerBasicAttack1State : PlayerStateBase
 
     public override void FixedTick()
     {
-        Core.Mover.Move(Core.Rotator.FacingRotation * (AnimDeltaPos / Time.fixedDeltaTime));
-        AnimDeltaPos = Vector3.zero;
+        MoveRootMotionAlongFacingDirection();
     }
 
     public override void AnimatorTick()

@@ -25,7 +25,7 @@ public class PlayerFastRunStopState : PlayerStateBase
         _runDirection = Core.Rotator.FacingRotation * Vector3.forward;
 
         // 이벤트 연결
-        Core.AnimationEvent.OnTransitionIdle += SetTransitionIdle;
+        Core.AnimationEvent.OnAnimationEnd += SetTransitionIdle;
 
         // 애니메이션 재생
         Core.Animator.SetTrigger("IsFastRunStop");
@@ -70,7 +70,7 @@ public class PlayerFastRunStopState : PlayerStateBase
 
     public override void FixedTick()
     {
-        Core.Mover.Move(Core.Rotator.FacingRotation * (AnimDeltaPos / Time.fixedDeltaTime));
+        Core.Mover.Move(AnimDeltaPos / Time.fixedDeltaTime);
         AnimDeltaPos = Vector3.zero;
     }
 
@@ -86,7 +86,7 @@ public class PlayerFastRunStopState : PlayerStateBase
         _currentStateTime = 0f;
 
         // 이벤트 해제
-        Core.AnimationEvent.OnTransitionIdle -= SetTransitionIdle;
+        Core.AnimationEvent.OnAnimationEnd -= SetTransitionIdle;
     }
 
     private void SetTransitionIdle()

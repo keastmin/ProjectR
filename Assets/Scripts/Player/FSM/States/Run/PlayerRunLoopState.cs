@@ -65,7 +65,7 @@ public class PlayerRunLoopState : PlayerStateBase
 
     public override void FixedTick()
     {
-        Core.Mover.Move(Core.Rotator.FacingRotation * (AnimDeltaPos / Time.fixedDeltaTime));
+        Core.Mover.Move(AnimDeltaPos / Time.fixedDeltaTime);
         AnimDeltaPos = Vector3.zero;
     }
 

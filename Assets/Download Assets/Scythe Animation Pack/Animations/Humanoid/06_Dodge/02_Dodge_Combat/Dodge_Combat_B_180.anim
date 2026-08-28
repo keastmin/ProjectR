@@ -122358,7 +122358,7 @@ AnimationClip:
     m_Level: 0
     m_CycleOffset: 0
     m_HasAdditiveReferencePose: 0
-    m_LoopTime: 1
+    m_LoopTime: 0
     m_LoopBlend: 0
     m_LoopBlendOrientation: 1
     m_LoopBlendPositionY: 1
@@ -257824,21 +257824,21 @@ AnimationClip:
   m_HasMotionFloatCurves: 0
   m_Events:
   - time: 0.16666667
-    functionName: OnDashExplosionEffectRight
+    functionName: OnRightBoostEffectInvoke
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
-  - time: 0.98333335
-    functionName: OnEnableOtherBehaviourActionInvoke
+  - time: 0.8833333
+    functionName: OnEnableOtherBehaviourInvoke
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
   - time: 1.5333333
-    functionName: OnTransitionIdleActionInvoke
+    functionName: OnAnimationEndInvoke
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0

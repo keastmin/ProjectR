@@ -2,8 +2,7 @@ using UnityEngine;
 
 public class PlayerFrontDodgeState : PlayerStateBase
 {
-    private bool _isTransitionFrontDodgeStop = false;
-    private bool _isTransitionFastRunLoop = false;
+    private bool _isTransitionNextAction = false;
 
     public PlayerFrontDodgeState(PlayerCore player) : base(player)
     {
@@ -14,12 +13,10 @@ public class PlayerFrontDodgeState : PlayerStateBase
     {
         Debug.Log("PlayerFrontDodgeState 진입");
         // 초기화
-        _isTransitionFrontDodgeStop = false;
-        _isTransitionFastRunLoop = false;
+        _isTransitionNextAction = false;
 
         // 이벤트 연결
-        Core.AnimationEvent.OnFrontDodgeStop += SetTransitionFrontDodgeStop;
-        Core.AnimationEvent.OnTransitionFastRunLoop += SetTransitionFastRunLoop;
+        Core.AnimationEvent.OnAnimationEnd += SetTransitionNextAction;
 
         // 애니메이션 시작
         Core.Animator.SetTrigger("IsFrontDodge");
@@ -38,24 +35,21 @@ public class PlayerFrontDodgeState : PlayerStateBase
             return;
         }
 
-        // 회피 종료 플래그 타이밍에 이동 입력이 없으면 정면 회피 멈춤으로 전환
-        if (_isTransitionFrontDodgeStop && !Core.InputCollector.IsInputMove)
+        // 다음 상태 판별
+        if (_isTransitionNextAction)
         {
-            Core.StateMachine.Transition(Core.StateMachine.FrontDodgeStopState);
-            return;
-        }
-
-        // 빠른 달리기 플래그 활성화 시 빠른 달리기로 전환
-        if (_isTransitionFastRunLoop)
-        {
-            Core.StateMachine.Transition(Core.StateMachine.FastRunLoopState);
+            // 이동 입력이 있으면 달리기 유지, 아니면 정면 회피 종료
+            if (Core.InputCollector.IsInputMove)
+                Core.StateMachine.Transition(Core.StateMachine.FastRunLoopState);
+            else
+                Core.StateMachine.Transition(Core.StateMachine.FrontDodgeStopState);
             return;
         }
     }
 
     public override void FixedTick()
     {
-        Core.Mover.Move(Core.Rotator.FacingRotation * (AnimDeltaPos / Time.fixedDeltaTime));
+        Core.Mover.Move(AnimDeltaPos / Time.fixedDeltaTime);
         AnimDeltaPos = Vector3.zero;
     }
 
@@ -67,21 +61,14 @@ public class PlayerFrontDodgeState : PlayerStateBase
     public override void Exit()
     {
         // 초기화
-        _isTransitionFrontDodgeStop = false;
-        _isTransitionFastRunLoop = false;
+        _isTransitionNextAction = false;
 
         // 이벤트 해제
-        Core.AnimationEvent.OnFrontDodgeStop -= SetTransitionFrontDodgeStop;
-        Core.AnimationEvent.OnTransitionFastRunLoop -= SetTransitionFastRunLoop;
+        Core.AnimationEvent.OnAnimationEnd -= SetTransitionNextAction;
     }
 
-    private void SetTransitionFrontDodgeStop()
+    private void SetTransitionNextAction()
     {
-        _isTransitionFrontDodgeStop = true;
-    }
-
-    private void SetTransitionFastRunLoop()
-    {
-        _isTransitionFastRunLoop = true;
+        _isTransitionNextAction = true;
     }
 }

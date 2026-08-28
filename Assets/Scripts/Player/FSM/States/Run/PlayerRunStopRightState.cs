@@ -13,7 +13,7 @@ public class PlayerRunStopRightState : PlayerStateBase
     {
         Debug.Log("PlayerRunStopRightState 진입");
         // 이벤트 연결
-        Core.AnimationEvent.OnKeepNext += SetTransitionIdle;
+        Core.AnimationEvent.OnAnimationEnd += SetTransitionIdle;
 
         // 초기화
         _isTransitionIdle = false;
@@ -55,7 +55,7 @@ public class PlayerRunStopRightState : PlayerStateBase
 
     public override void FixedTick()
     {
-        Core.Mover.Move(Core.Rotator.FacingRotation * (AnimDeltaPos / Time.fixedDeltaTime));
+        Core.Mover.Move(AnimDeltaPos / Time.fixedDeltaTime);
         AnimDeltaPos = Vector3.zero;
     }
 
@@ -67,7 +67,7 @@ public class PlayerRunStopRightState : PlayerStateBase
     public override void Exit()
     {
         // 이벤트 해제
-        Core.AnimationEvent.OnKeepNext -= SetTransitionIdle;
+        Core.AnimationEvent.OnAnimationEnd -= SetTransitionIdle;
 
         // 초기화
         _isTransitionIdle = false;

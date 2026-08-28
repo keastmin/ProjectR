@@ -9,6 +9,7 @@ public class EnemyEngageState : EnemyCompositeState
     private readonly EnemyCombatMoveForwardState _moveForwardState;
     private readonly EnemyCombatMoveBackwardState _moveBackwardState;
 
+    private float _attackCooldown = 5f;
     private float _nextAttackTime = 0f;
     private float _decisionTime;
     private bool _isDamaged = false;
@@ -27,6 +28,7 @@ public class EnemyEngageState : EnemyCompositeState
     {
         // 초기화
         _isDamaged = false;
+        _nextAttackTime = 0f;
 
         // 이벤트 연결
         Core.OnDamaged += SetDamaged;
@@ -39,6 +41,8 @@ public class EnemyEngageState : EnemyCompositeState
     {
         if (_isDamaged)
             return;
+
+        _nextAttackTime += Time.deltaTime;
 
         if (Core.TargetTransform == null)
         {
@@ -67,6 +71,7 @@ public class EnemyEngageState : EnemyCompositeState
     {
         // 초기화
         _isDamaged = false;
+        _nextAttackTime = 0f;
 
         // 이벤트 해제
         Core.OnDamaged -= SetDamaged;
@@ -76,9 +81,9 @@ public class EnemyEngageState : EnemyCompositeState
 
     private void SelectNextAction()
     {
-        if (CanEnterSlashAttack())
+        if(_nextAttackTime >= _attackCooldown)
         {
-            Core.StateMachine.Transition(Core.StateMachine.SlashAttackState);
+            Core.StateMachine.Transition(Core.StateMachine.CloseAttackState);
             return;
         }
 
@@ -122,39 +127,5 @@ public class EnemyEngageState : EnemyCompositeState
             Core.StateMachine.Transition(Core.StateMachine.FrontHitState);
         else if (type == HitDirectionType.Back)
             Core.StateMachine.Transition(Core.StateMachine.BackHitState);
-    }
-
-    private bool CanEnterSlashAttack()
-    {
-        Transform target = Core.TargetTransform;
-
-        if (target == null)
-            return false;
-
-        Vector3 toTarget = target.position - Core.transform.position;
-        toTarget.y = 0f;
-
-        float sqrDistance = toTarget.sqrMagnitude;
-
-        if (sqrDistance > Core.SlashAttackRange * Core.SlashAttackRange)
-            return false;
-
-        if (sqrDistance <= 0.001f)
-            return false;
-
-        Vector3 targetDirection = toTarget.normalized;
-
-        float facingDot = Vector3.Dot(
-            Core.Rotator.FacingDirection,
-            targetDirection);
-
-        float minimunAttackFacingDot = Mathf.Cos(Core.SlashAttackAngle * Mathf.Deg2Rad);
-        if (facingDot < minimunAttackFacingDot)
-            return false;
-
-        if (Time.time < _nextAttackTime)
-            return false;
-
-        return true;
     }
 }

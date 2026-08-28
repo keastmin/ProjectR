@@ -4,7 +4,7 @@ public class EnemyStateMachine
 {
     public EnemyIdleState IdleState;
     public EnemyEngageState EngageState;
-    public EnemySlashAttackState SlashAttackState;
+    public EnemyCloseAttackState CloseAttackState;
     public EnemyFrontHitState FrontHitState;
     public EnemyBackHitState BackHitState;
 
@@ -14,7 +14,7 @@ public class EnemyStateMachine
     {
         IdleState = new EnemyIdleState(enemy);
         EngageState = new EnemyEngageState(enemy);
-        SlashAttackState = new EnemySlashAttackState(enemy);
+        CloseAttackState = new EnemyCloseAttackState(enemy);
         FrontHitState = new EnemyFrontHitState(enemy);
         BackHitState = new EnemyBackHitState(enemy);
     }

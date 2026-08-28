@@ -5,9 +5,10 @@ using UnityEngine.Playables;
 public class PlayerCore : MonoBehaviour, IHitStopParticipant
 {
     [SerializeField] private Camera _mainCamera;
+    [SerializeField] private Animator _animator;
+    [SerializeField] private PlayerAnimatorController _animatorController;
 
     // 컴포넌트
-    private Animator _animator;
     private TimelineDirectorContainer _directorContainer;
     private PlayerMover _mover;
     private PlayerRotator _rotator;
@@ -42,7 +43,9 @@ public class PlayerCore : MonoBehaviour, IHitStopParticipant
 
     private void Awake()
     {
-        TryGetComponent(out _animator);
+        // 애니메이터 초기화
+        _animatorController.OnAnimationTick += OnAnimationTickLoop; // OnAnimatorMove 틱에 작동하는 함수
+
         TryGetComponent(out _directorContainer);
         _directorContainer.InitTimelineDirectorContainer();
         TryGetComponent(out _mover);
@@ -88,20 +91,8 @@ public class PlayerCore : MonoBehaviour, IHitStopParticipant
         StateMachine.LateTick();
     }
 
-    private void OnAnimatorMove()
+    private void OnAnimationTickLoop()
     {
-#if UNITY_EDITOR
-        // Timeline 편집 상태에서 스크럽할 때만
-        if (!Application.isPlaying)
-        {
-            if (_animator == null)
-                _animator = GetComponent<Animator>();
-
-            _animator.ApplyBuiltinRootMotion();
-            return;
-        }
-#endif
-
         if (_isHitStopped)
             return;
 

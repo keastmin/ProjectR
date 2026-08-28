@@ -19,7 +19,7 @@ public class PlayerBackDodgeState : PlayerStateBase
 
         // 이벤트 연결
         Core.AnimationEvent.OnEnableOtherBehaviour += SetEnableOtherBehaviour;
-        Core.AnimationEvent.OnTransitionIdle += SetTransitionIdle;
+        Core.AnimationEvent.OnAnimationEnd += SetTransitionIdle;
 
         // 애니메이션 재생
         Core.Animator.SetTrigger("IsBackDodge");
@@ -70,7 +70,7 @@ public class PlayerBackDodgeState : PlayerStateBase
 
     public override void FixedTick()
     {
-        Core.Mover.Move(Core.Rotator.FacingRotation * (AnimDeltaPos / Time.fixedDeltaTime));
+        Core.Mover.Move(AnimDeltaPos / Time.fixedDeltaTime);
         AnimDeltaPos = Vector3.zero;
     }
 
@@ -83,7 +83,7 @@ public class PlayerBackDodgeState : PlayerStateBase
     {
         // 이벤트 해제
         Core.AnimationEvent.OnEnableOtherBehaviour -= SetEnableOtherBehaviour;
-        Core.AnimationEvent.OnTransitionIdle -= SetTransitionIdle;
+        Core.AnimationEvent.OnAnimationEnd -= SetTransitionIdle;
 
         // 초기화
         _isEnableOtherBehaviour = false;

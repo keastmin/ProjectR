@@ -15,7 +15,7 @@ public class PlayerFastRunTurnState : PlayerStateBase
         _isTransitionFastRunLoop = false;
 
         // 이벤트 연결
-        Core.AnimationEvent.OnFastRunTurnEnd += SetTransitionFastRunLoop;
+        Core.AnimationEvent.OnAnimationEnd += SetTransitionFastRunLoop;
 
         // 애니메이션 재생
         Core.Animator.SetTrigger("IsFastRunTurn");
@@ -53,7 +53,7 @@ public class PlayerFastRunTurnState : PlayerStateBase
 
     public override void FixedTick()
     {
-        Core.Mover.Move(Core.Rotator.FacingRotation * (AnimDeltaPos / Time.fixedDeltaTime));
+        Core.Mover.Move(AnimDeltaPos / Time.fixedDeltaTime);
         AnimDeltaPos = Vector3.zero;
     }
 
@@ -70,7 +70,7 @@ public class PlayerFastRunTurnState : PlayerStateBase
         _isTransitionFastRunLoop = false;
 
         // 이벤트 해제
-        Core.AnimationEvent.OnFastRunTurnEnd -= SetTransitionFastRunLoop;
+        Core.AnimationEvent.OnAnimationEnd -= SetTransitionFastRunLoop;
     }
 
     private void SetTransitionFastRunLoop()

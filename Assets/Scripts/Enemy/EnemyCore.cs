@@ -3,16 +3,6 @@ using UnityEngine;
 
 public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
 {
-    [Header("Slash Attack")]
-    [SerializeField, Min(0f)]
-    private float _slashAttackRange = 2.5f;
-
-    [SerializeField, Range(0f, 180f)]
-    private float _slashAttackAngle = 30f;
-
-    [SerializeField, Min(0f)]
-    private float _slashAttackCooldown = 1.5f;
-
     [SerializeField, Min(0f)] private float _maxHP = 100f;
     [SerializeField] private float _currentHP;
 
@@ -27,11 +17,7 @@ public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
     private EnemyTargetDetector _targetDetector;
     private bool _isHitStopped;
     private float _animatorSpeedBeforeHitStop = 1f;
-    private float _nextSlashAttackTime;
 
-    public float SlashAttackRange => _slashAttackRange;
-    public float SlashAttackAngle => _slashAttackAngle;
-    public float SlashAttackCooldown => _slashAttackCooldown;
     public float CurrentHP => _currentHP;
     public Animator Animator => _animatorCallback.Animator;
     public EnemyRotator Rotator => _rotator;
@@ -42,7 +28,6 @@ public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
     public DamageData LastDamageData => _lastDamageData;
     public bool IsHitStopped => _isHitStopped;
     public Transform TargetTransform => TargetDetector.TargetTransform;
-    public bool IsSlashAttackReady => Time.time >= _nextSlashAttackTime;
 
     public event Action<DamageData> OnDamaged;
 
@@ -139,11 +124,5 @@ public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
         _isHitStopped = false;
         Animator.speed = _animatorSpeedBeforeHitStop;
         _mover.SetHitStopped(false);
-    }
-
-    public void StartSlashAttackCooldown()
-    {
-        _nextSlashAttackTime =
-            Time.time + _slashAttackCooldown;
     }
 }

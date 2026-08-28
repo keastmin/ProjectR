@@ -20,8 +20,8 @@ public class PlayerRunStartState : PlayerStateBase
         _isTransitionRunLoop = false;
 
         // 이벤트 연결
-        Core.AnimationEvent.OnDisableQuickTurn += HandleQuickTurnEvent;
-        Core.AnimationEvent.OnKeepNext += SetTransitionRunLoop;
+        Core.AnimationEvent.OnHighSpeedRotationEnd += HandleQuickTurnEvent;
+        Core.AnimationEvent.OnAnimationEnd += SetTransitionRunLoop;
 
         Core.Animator.SetTrigger("IsRunStart");
     }
@@ -61,7 +61,7 @@ public class PlayerRunStartState : PlayerStateBase
 
     public override void FixedTick()
     {
-        Core.Mover.Move(Core.Rotator.FacingRotation * (AnimDeltaPos / Time.fixedDeltaTime));
+        Core.Mover.Move(AnimDeltaPos / Time.fixedDeltaTime);
         AnimDeltaPos = Vector3.zero;
     }
 
@@ -77,8 +77,8 @@ public class PlayerRunStartState : PlayerStateBase
         _isTransitionRunLoop = false;
 
         // 이벤트 해제
-        Core.AnimationEvent.OnDisableQuickTurn -= HandleQuickTurnEvent;
-        Core.AnimationEvent.OnKeepNext -= SetTransitionRunLoop;
+        Core.AnimationEvent.OnHighSpeedRotationEnd -= HandleQuickTurnEvent;
+        Core.AnimationEvent.OnAnimationEnd -= SetTransitionRunLoop;
     }
 
     private void Rotation()

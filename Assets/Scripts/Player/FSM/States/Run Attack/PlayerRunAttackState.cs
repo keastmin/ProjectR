@@ -19,8 +19,8 @@ public class PlayerRunAttackState : PlayerStateBase
         _isEnableOtherBehaviour = false;
 
         // 이벤트 연결
-        Core.AnimationEvent.OnRunAttackEnableOtherBehaviour += SetEnableOtherBehaviour;
-        Core.AnimationEvent.OnRunAttackEnd += SetTransitionIdle;
+        Core.AnimationEvent.OnEnableOtherBehaviour += SetEnableOtherBehaviour;
+        Core.AnimationEvent.OnAnimationEnd += SetTransitionIdle;
 
         // 즉시 회전
         Vector3 targetDirection = Core.TargetDetector.NearestEnemyCollider == null ?
@@ -73,8 +73,7 @@ public class PlayerRunAttackState : PlayerStateBase
 
     public override void FixedTick()
     {
-        Core.Mover.Move(Core.Rotator.FacingRotation * (AnimDeltaPos / Time.fixedDeltaTime));
-        AnimDeltaPos = Vector3.zero;
+        MoveRootMotionAlongFacingDirection();
     }
 
     public override void AnimatorTick()
@@ -93,8 +92,8 @@ public class PlayerRunAttackState : PlayerStateBase
         _isEnableOtherBehaviour = false;
 
         // 이벤트 해제
-        Core.AnimationEvent.OnRunAttackEnableOtherBehaviour -= SetEnableOtherBehaviour;
-        Core.AnimationEvent.OnRunAttackEnd -= SetTransitionIdle;
+        Core.AnimationEvent.OnEnableOtherBehaviour -= SetEnableOtherBehaviour;
+        Core.AnimationEvent.OnAnimationEnd -= SetTransitionIdle;
     }
 
     private void SetTransitionIdle()

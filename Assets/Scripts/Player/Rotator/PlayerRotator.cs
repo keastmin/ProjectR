@@ -9,6 +9,7 @@ public class PlayerRotator : MonoBehaviour
     private Quaternion _facingRotation = Quaternion.identity;
 
     public Quaternion FacingRotation => _facingRotation;
+    public Vector3 FacingDirection => FacingRotation * Vector3.forward;
 
     private void Awake()
     {

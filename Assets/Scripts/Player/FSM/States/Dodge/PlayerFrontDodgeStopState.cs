@@ -16,7 +16,7 @@ public class PlayerFrontDodgeStopState : PlayerStateBase
         _isTransitionIdle = false;
 
         // 이벤트 연결
-        Core.AnimationEvent.OnKeepNext += SetTransitionIdle;
+        Core.AnimationEvent.OnAnimationEnd += SetTransitionIdle;
 
         // 애니메이션 시작
         Core.Animator.SetTrigger("IsFrontDodgeStop");
@@ -55,7 +55,7 @@ public class PlayerFrontDodgeStopState : PlayerStateBase
 
     public override void FixedTick()
     {
-        Core.Mover.Move(Core.Rotator.FacingRotation * (AnimDeltaPos / Time.fixedDeltaTime));
+        Core.Mover.Move(AnimDeltaPos / Time.fixedDeltaTime);
         AnimDeltaPos = Vector3.zero;
     }
 
@@ -70,7 +70,7 @@ public class PlayerFrontDodgeStopState : PlayerStateBase
         _isTransitionIdle = false;
 
         // 이벤트 해제
-        Core.AnimationEvent.OnKeepNext -= SetTransitionIdle;
+        Core.AnimationEvent.OnAnimationEnd -= SetTransitionIdle;
     }
 
     private void SetTransitionIdle()

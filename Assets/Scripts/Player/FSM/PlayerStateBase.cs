@@ -40,6 +40,18 @@ public class PlayerStateBase
         AnimDeltaPos = Vector3.zero;
     }
 
+    protected void MoveRootMotionAlongFacingDirection()
+    {
+        Vector3 forward = Core.Rotator.FacingDirection;
+        forward.y = 0f;
+        forward.Normalize();
+
+        float forwardDelta = Vector3.Dot(AnimDeltaPos, forward);
+
+        Core.Mover.Move(forward * forwardDelta / Time.fixedDeltaTime);
+        AnimDeltaPos = Vector3.zero;
+    }
+
     public virtual void Exit()
     {
 

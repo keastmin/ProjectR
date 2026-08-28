@@ -67,9 +67,6 @@ public abstract class EnemyAttackState : EnemyStateBase
 
         // 플래그 리셋
         Core.Animator.ResetTrigger(AnimationTrigger);
-
-        // 공격 쿨타임 시작
-        Core.StartSlashAttackCooldown();
     }
 
     private void SetTransitionIdle(AnimationEvent animationEvent)
