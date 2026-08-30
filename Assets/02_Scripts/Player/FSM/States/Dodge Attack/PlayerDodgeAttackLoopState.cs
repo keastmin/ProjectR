@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class PlayerDodgeAttackLoopState : PlayerDodgeAttackState
 {
-    protected override DirectorID AttackDirectorID => DirectorID.DodgeAttackStart;
+    protected override DirectorID AttackDirectorID => DirectorID.DodgeAttackLoop;
 
     protected override string AnimationTrigger => "IsDodgeAttack";
 
