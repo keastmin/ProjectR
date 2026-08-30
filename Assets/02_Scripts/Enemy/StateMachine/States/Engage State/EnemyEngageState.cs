@@ -1,3 +1,4 @@
+using Unity.Cinemachine;
 using UnityEngine;
 
 public class EnemyEngageState : EnemyCompositeState
@@ -83,7 +84,7 @@ public class EnemyEngageState : EnemyCompositeState
     {
         if(_nextAttackTime >= _attackCooldown)
         {
-            Core.StateMachine.Transition(Core.StateMachine.CloseAttackState);
+            Core.StateMachine.Transition(Core.StateMachine.CloseAttackNoticeState);
             return;
         }
 

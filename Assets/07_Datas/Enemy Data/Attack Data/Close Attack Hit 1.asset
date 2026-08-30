@@ -24,3 +24,8 @@ MonoBehaviour:
     Center: {x: -0.06853843, y: 0.9933944, z: 0.9335436}
     Size: {x: 1.9295597, y: 1.9690752, z: 1.121368}
     Radius: {x: 0, y: 0, z: 0}
+  AttackAnimationClip: {fileID: 7400000, guid: 3ce31705133e22543b63ccf989c740c4, type: 2}
+  RootMotionMultiply: 2.5
+  SimulateStup: 5
+  AttackFunctionName: OnAttack
+  AttackAnimationTransitionTime: 0.5

@@ -7,6 +7,7 @@ public class EnemyStateMachine
     public EnemyCloseAttackState CloseAttackState;
     public EnemyFrontHitState FrontHitState;
     public EnemyBackHitState BackHitState;
+    public EnemyCloseAttackNoticeState CloseAttackNoticeState;
 
     private EnemyStateBase _currentState;
 
@@ -17,6 +18,7 @@ public class EnemyStateMachine
         CloseAttackState = new EnemyCloseAttackState(enemy);
         FrontHitState = new EnemyFrontHitState(enemy);
         BackHitState = new EnemyBackHitState(enemy);
+        CloseAttackNoticeState = new EnemyCloseAttackNoticeState(enemy);
     }
 
     public void InitEnemyStateMachine(EnemyStateBase initState)

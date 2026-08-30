@@ -29,4 +29,9 @@ public class EnemyAnimationEvent : MonoBehaviour
         Transform spawnPoint = _attackNoticePoint != null ? _attackNoticePoint : transform;
         CombatEffectRequestBus.Request(CombatEffectID.AttackNoticeEffect, spawnPoint);
     }
+
+    public void AttackWindowActive(bool isActive)
+    {
+
+    }
 }

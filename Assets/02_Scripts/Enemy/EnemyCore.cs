@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
@@ -7,6 +8,7 @@ public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
     [SerializeField] private float _currentHP;
 
     [SerializeField] private EnemyAnimatorCallback _animatorCallback;
+    [SerializeField] private EnemyAttackSO[] _attackSOs;
 
     private DamageData _lastDamageData;
 
@@ -16,6 +18,7 @@ public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
     private EnemyStateMachine _stateMachine;
     private EnemyTargetDetector _targetDetector;
     private EnemyHitboxPool _hitboxPool;
+    private EnemyAttackSimulator _attackSimulator;
     private bool _isHitStopped;
     private float _animatorSpeedBeforeHitStop = 1f;
 
@@ -27,19 +30,28 @@ public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
     public EnemyStateMachine StateMachine => _stateMachine;
     public EnemyTargetDetector TargetDetector => _targetDetector;
     public EnemyHitboxPool HitboxPool => _hitboxPool;
+    public EnemyAttackSimulator AttackSimulator => _attackSimulator;
     public DamageData LastDamageData => _lastDamageData;
     public bool IsHitStopped => _isHitStopped;
     public Transform TargetTransform => TargetDetector.TargetTransform;
+
+    public Dictionary<EnemyAttackID, EnemyAttackSO> AttackDataDictionary;
 
     public event Action<DamageData> OnDamaged;
 
     private void Awake()
     {
+        // 공격 데이터 저장
+        AttackDataDictionary = new Dictionary<EnemyAttackID, EnemyAttackSO>();
+        foreach (var so in _attackSOs)
+            AttackDataDictionary.Add(so.AttackID, so);
+
         TryGetComponent(out _rotator);
         TryGetComponent(out _mover);
         TryGetComponent(out _animationEvent);
         TryGetComponent(out _targetDetector);
         TryGetComponent(out _hitboxPool);
+        TryGetComponent(out _attackSimulator);
 
         _currentHP = _maxHP;
 
