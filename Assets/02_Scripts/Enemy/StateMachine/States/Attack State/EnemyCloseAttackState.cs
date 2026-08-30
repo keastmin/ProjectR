@@ -10,4 +10,10 @@ public class EnemyCloseAttackState : EnemyAttackState
     {
         AnimDeltaPos += (Core.Animator.deltaPosition * 2f);
     }
+
+    public override void Exit()
+    {
+        Core.AnimationEvent.SwordTrailEffectActive(false);
+        base.Exit();
+    }
 }

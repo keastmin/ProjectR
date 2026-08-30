@@ -21,6 +21,9 @@ public class PlayerStateMachine
     public PlayerHitFrontState HitFrontState;
     public PlayerHitBackState HitBackState;
     public PlayerHitLargeState HitLargeState;
+    public PlayerDodgeAttackStartState DodgeAttackStartState;
+    public PlayerDodgeAttackLoopState DodgeAttackLoopState;
+    public PlayerDodgeAttackEndState DodgeAttackEndState;
 
     private PlayerStateBase _currentState;
     private Animator _playerAnimator;
@@ -47,6 +50,9 @@ public class PlayerStateMachine
         HitFrontState = new PlayerHitFrontState(player);
         HitBackState = new PlayerHitBackState(player);
         HitLargeState = new PlayerHitLargeState(player);
+        DodgeAttackStartState = new PlayerDodgeAttackStartState(player);
+        DodgeAttackLoopState = new PlayerDodgeAttackLoopState(player);
+        DodgeAttackEndState = new PlayerDodgeAttackEndState(player);
     }
 
     public void InitStateMachine(PlayerStateBase initState)

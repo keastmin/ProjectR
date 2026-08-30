@@ -13,6 +13,7 @@ public class PlayerAnimationEventSender : MonoBehaviour
     public UnityEvent OnEnableOtherBehaviour; // 다른 행동 가능
     public UnityEvent OnAnimationEnd; // 애니메이션 종료
     public UnityEvent OnHighSpeedRotationSpeedEnd; // 회전이 빨라지는 구간 종료
+    public UnityEvent OnPerfectDodgeEnd; // 완벽 회피 종료
 
     private void Awake()
     {
@@ -58,5 +59,10 @@ public class PlayerAnimationEventSender : MonoBehaviour
     public void OnHighSpeedRotationSpeedEndInvoke()
     {
         OnHighSpeedRotationSpeedEnd?.Invoke();
+    }
+
+    public void OnPerfectDodgeEndInvoke()
+    {
+        OnPerfectDodgeEnd?.Invoke();
     }
 }

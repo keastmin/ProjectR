@@ -4,5 +4,8 @@ public enum DirectorID
     BasicAttack2,
     BasicAttack3,
     BasicAttack4,
-    RunAttack
+    RunAttack,
+    DodgeAttackStart,
+    DodgeAttackLoop,
+    DodgeAttackEnd
 }

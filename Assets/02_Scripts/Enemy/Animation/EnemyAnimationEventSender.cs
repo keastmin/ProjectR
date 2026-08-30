@@ -15,4 +15,19 @@ public class EnemyAnimationEventSender : MonoBehaviour
     {
         _animEvent.AttackActionInvoke(enemyAttackSO);
     }
+
+    public void OnSwordTrailEffectActive()
+    {
+        _animEvent.SwordTrailEffectActive(true);
+    }
+
+    public void OnSwordTrailEffectDeactive()
+    {
+        _animEvent.SwordTrailEffectActive(false);
+    }
+
+    public void OnAttackNotice()
+    {
+        _animEvent.AttackNotice();
+    }
 }

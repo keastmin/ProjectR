@@ -6,10 +6,28 @@ public abstract class PlayerDodgeState : PlayerStateBase
 
     public PlayerDodgeState(PlayerCore core) : base(core) { }
 
+    protected bool IsPerfectDodge = false;
+    protected bool IsPerfectDodgeEnd = false;
+
     public override void Enter()
     {
+        // 초기화
+        IsPerfectDodge = false;
+        IsPerfectDodgeEnd = false;
+
         // 애니메이션 재생
         Core.Animator.SetTrigger(AnimationTrigger);
+
+        // 회피 판별
+        if (DeterminePerfectDodge())
+        {
+            IsPerfectDodge = true;
+
+            // 플레이어, 적 전체, VFX 슬로우 모션 Fade In 진입
+            // 화면 Effect 발동
+            // 플레이어 캐릭터 트레일 연출
+            // 이 모든 것을 여기서 직접 호출하지 않고 Core의 함수를 호출하여 Action을 Invoke를 하는 등 외부에서 느슨하게 호출 가능한 구조를 통해 진행한다.
+        }
 
         base.Enter();
     }
@@ -33,9 +51,19 @@ public abstract class PlayerDodgeState : PlayerStateBase
 
     public override void Exit()
     {
+        // 초기화
+        IsPerfectDodge = false;
+        IsPerfectDodgeEnd = false;
+
         // 애니메이션 트리거 리셋
         Core.Animator.ResetTrigger(AnimationTrigger);
 
         base.Exit();
+    }
+
+    // 완벽 회피인지 검사
+    private bool DeterminePerfectDodge()
+    {
+        return false;
     }
 }

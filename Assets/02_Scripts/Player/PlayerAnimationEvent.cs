@@ -16,6 +16,7 @@ public class PlayerAnimationEvent : MonoBehaviour
     public event Action OnHighSpeedRotationEnd; // 빠른 속도로 회전 종료
     public event Action OnEnableOtherBehaviour; // 다른 행동 가능
     public event Action OnAnimationEnd; // 공용 다음 상태로 이어서 가는 이벤트
+    public event Action OnPerfectDodgeEnd; // 완벽 회피 종료 이벤트
 
     private void Awake()
     {
@@ -79,5 +80,11 @@ public class PlayerAnimationEvent : MonoBehaviour
         Vector3 pos = _dashWindTransform.position;
         Quaternion rot = _dashWindTransform.rotation;
         Instantiate(_dashWindParicle, pos, rot);
+    }
+
+    // Perfect Dodge를 종료 시키는 함수
+    public void OnPerfectDodgeEndInvoke()
+    {
+        OnPerfectDodgeEnd?.Invoke();
     }
 }
