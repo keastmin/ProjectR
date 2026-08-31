@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
 {
@@ -9,6 +10,9 @@ public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
 
     [SerializeField] private EnemyAnimatorCallback _animatorCallback;
     [SerializeField] private EnemyAttackSO[] _attackSOs;
+
+    [SerializeField] private Collider[] _closeAttackNoticeBoxies;
+    [SerializeField] private LayerMask _playerHurtboxLayer;
 
     private DamageData _lastDamageData;
 
@@ -36,8 +40,11 @@ public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
     public Transform TargetTransform => TargetDetector.TargetTransform;
 
     public Dictionary<EnemyAttackID, EnemyAttackSO> AttackDataDictionary;
-
+    public Collider[] CloseAttackNotiveBoxies => _closeAttackNoticeBoxies;
     public event Action<DamageData> OnDamaged;
+
+    private List<Collider> _attackRangeColliders = new();
+    private Collider[] _playerDetectCollider = new Collider[10];
 
     private void Awake()
     {
@@ -146,5 +153,56 @@ public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
     private void HandleAttack(EnemyAttackSO attackSO)
     {
         HitboxPool.SpacingHitboxes(attackSO);
+    }
+
+    public void SetAttackNoticeCollider(Collider[] colliders)
+    {
+        if (_attackRangeColliders == null)
+            _attackRangeColliders = new List<Collider>();
+        ClearAttackNoticeCollider();
+        foreach(var col in colliders)
+        {
+            if (col != null)
+                _attackRangeColliders.Add(col);
+        }
+    }
+
+    public void ClearAttackNoticeCollider()
+    {
+        if (_attackRangeColliders == null)
+            _attackRangeColliders = new List<Collider>();
+        _attackRangeColliders.Clear();
+    }
+
+    public bool IsPlayerInEnemyAttackRange()
+    {
+        foreach(var col in _attackRangeColliders)
+        {
+            if(col != null)
+            {
+                if (col is BoxCollider box)
+                {
+                    Vector3 halfExtents = Vector3.Scale(box.size, Abs(box.transform.lossyScale)) * 0.5f;
+
+                    int detectCount = Physics.OverlapBoxNonAlloc(
+                                              box.transform.TransformPoint(box.center),
+                                              halfExtents,
+                                              _playerDetectCollider,
+                                              box.transform.rotation,
+                                              _playerHurtboxLayer,
+                                              QueryTriggerInteraction.Collide);
+
+                    if (detectCount > 0)
+                        return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private Vector3 Abs(Vector3 value)
+    {
+        return new Vector3(Mathf.Abs(value.x), Mathf.Abs(value.y), Mathf.Abs(value.z));
     }
 }

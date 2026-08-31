@@ -11,7 +11,7 @@ public abstract class EnemyAttackNoticeState : EnemyStateBase
     public override void Enter()
     {
         // 공격 알림 VFX 재생
-        Core.AnimationEvent.AttackNotice();
+        Core.AnimationEvent.AttackNoticeVFX();
 
         // 애니메이션 재생
         Core.Animator.SetTrigger("IsIdle");

@@ -19,9 +19,11 @@ public abstract class PlayerDodgeState : PlayerStateBase
         Core.Animator.SetTrigger(AnimationTrigger);
 
         // 회피 판별
-        if (DeterminePerfectDodge())
+        if (Core.IsPerfectDodge(out EnemyCore enemy))
         {
             IsPerfectDodge = true;
+
+            Debug.Log(enemy.name);
 
             // 플레이어, 적 전체, VFX 슬로우 모션 Fade In 진입
             // 화면 Effect 발동
@@ -59,11 +61,5 @@ public abstract class PlayerDodgeState : PlayerStateBase
         Core.Animator.ResetTrigger(AnimationTrigger);
 
         base.Exit();
-    }
-
-    // 완벽 회피인지 검사
-    private bool DeterminePerfectDodge()
-    {
-        return false;
     }
 }

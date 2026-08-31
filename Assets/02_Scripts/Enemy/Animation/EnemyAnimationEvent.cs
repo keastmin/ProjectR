@@ -8,6 +8,7 @@ public class EnemyAnimationEvent : MonoBehaviour
     [SerializeField] private Transform _attackNoticePoint;
     public event Action<AnimationEvent> OnAnimationEnd;
     public event Action<EnemyAttackSO> OnAttack;
+    public event Action<int> OnSetAttackNoticeWindow;
 
     public void AnimationEndActionInvoke(AnimationEvent animationEvent)
     {
@@ -24,14 +25,14 @@ public class EnemyAnimationEvent : MonoBehaviour
         _swordTrailEffect.enabled = isActive;
     }
 
-    public void AttackNotice()
+    public void AttackNoticeVFX()
     {
         Transform spawnPoint = _attackNoticePoint != null ? _attackNoticePoint : transform;
         CombatEffectRequestBus.Request(CombatEffectID.AttackNoticeEffect, spawnPoint);
     }
 
-    public void AttackWindowActive(bool isActive)
+    public void AttackWindowActive(int index)
     {
-
+        OnSetAttackNoticeWindow?.Invoke(index);
     }
 }

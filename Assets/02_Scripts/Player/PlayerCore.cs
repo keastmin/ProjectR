@@ -47,6 +47,7 @@ public class PlayerCore : MonoBehaviour, IHitStopParticipant, IDamageable
 
     // 이벤트
     public event Action<DamageData> OnDamaged; // 피해를 입었을 때 호출하는 이벤트
+    public Func<EnemyCore> OnPerfectDodgeCheck; // 완벽 회피라면 완벽회피를 하게 한 대상을 반환 
 
     private void Awake()
     {
@@ -166,6 +167,14 @@ public class PlayerCore : MonoBehaviour, IHitStopParticipant, IDamageable
         OnDamaged?.Invoke(damageData);
 
         return true;
+    }
+
+    // 완벽 회피인지 검사
+    public bool IsPerfectDodge(out EnemyCore enemyCore)
+    {
+        enemyCore = null;
+        enemyCore = OnPerfectDodgeCheck?.Invoke();
+        return enemyCore != null;
     }
 
     private readonly struct PlayableSpeedSnapshot

@@ -18,8 +18,9 @@ public class EnemyCloseAttackNoticeState : EnemyAttackNoticeState
     public override void Enter()
     {
         base.Enter();
+        Collider[] attackColliders = { Core.CloseAttackNotiveBoxies[0] };
+        Core.SetAttackNoticeCollider(attackColliders);
         _currentTime = 0f;
-        PushAttackWindow();
     }
 
     public override void UpdateTick()
@@ -36,11 +37,7 @@ public class EnemyCloseAttackNoticeState : EnemyAttackNoticeState
 
     public override void Exit()
     {
+        Core.ClearAttackNoticeCollider();
         base.Exit();
-    }
-
-    private void PushAttackWindow()
-    {
-
     }
 }

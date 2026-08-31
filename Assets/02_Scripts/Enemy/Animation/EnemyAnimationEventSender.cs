@@ -26,18 +26,13 @@ public class EnemyAnimationEventSender : MonoBehaviour
         _animEvent.SwordTrailEffectActive(false);
     }
 
-    public void OnAttackNotice()
+    public void OnAttackNoticeVFX()
     {
-        _animEvent.AttackNotice();
+        _animEvent.AttackNoticeVFX();
     }
 
-    public void OnAttackWindowOn()
+    public void OnAttackNoticeWindow(int index)
     {
-        _animEvent.AttackWindowActive(true);
-    }
-
-    public void OnAttackWindowOff()
-    {
-        _animEvent.AttackWindowActive(false);
+        _animEvent.AttackWindowActive(index);
     }
 }
