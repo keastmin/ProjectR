@@ -30,7 +30,7 @@ public class PlayerRunLoopState : PlayerStateBase
             return;
 
         // 상태 시간 누적
-        _currentStateTime += Time.deltaTime;
+        _currentStateTime += CombatTimeController.DeltaTime;
 
         // 회전
         Rotation();

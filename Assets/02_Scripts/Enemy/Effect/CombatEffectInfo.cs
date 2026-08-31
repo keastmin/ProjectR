@@ -16,7 +16,7 @@ public struct CombatEffectPoolInfo
     [Min(1), Tooltip("동시에 사용할 수 있는 최대 개수입니다. 모두 사용 중이면 가장 오래된 이펙트를 재사용합니다.")]
     public int MaxSize;
 
-    [Min(0.01f), Tooltip("재생 후 Stop/Clear하고 풀로 돌려보낼 때까지의 시간(초)입니다.")]
+    [Min(0.01f), Tooltip("재생 후 Stop/Clear하고 풀로 돌려보낼 때까지의 전투 시간(초)입니다. 슬로우 중에는 실제 수명이 길어집니다.")]
     public float PlaybackDuration;
 }
 

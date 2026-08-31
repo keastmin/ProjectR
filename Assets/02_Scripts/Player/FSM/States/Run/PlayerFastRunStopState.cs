@@ -38,7 +38,7 @@ public class PlayerFastRunStopState : PlayerStateBase
         if (IsDamaged)
             return;
 
-        _currentStateTime += Time.deltaTime;
+        _currentStateTime += CombatTimeController.DeltaTime;
 
         // 회피 입력이 있으면 뒤로 회피로 전환
         if (Core.InputCollector.IsInputDodge)

@@ -26,10 +26,14 @@ public class PlayerStateMachine
     public PlayerDodgeAttackEndState DodgeAttackEndState;
 
     private PlayerStateBase _currentState;
+    private readonly PlayerCore _core;
     private Animator _playerAnimator;
+
+    public bool IsInvulnerable => _currentState?.IsInvulnerable == true;
 
     public PlayerStateMachine(PlayerCore player)
     {
+        _core = player;
         _playerAnimator = player.Animator;
         IdleState = new PlayerIdleState(player);
         RunStartState = new PlayerRunStartState(player);
@@ -89,6 +93,8 @@ public class PlayerStateMachine
     public void Transition(PlayerStateBase nextState)
     {
         _currentState?.Exit();
+        if (_currentState is PlayerDodgeAttackState && nextState is not PlayerDodgeAttackState)
+            _core.ClearDodgeAttackTarget();
         _currentState = nextState;
         _currentState?.Enter();
     }

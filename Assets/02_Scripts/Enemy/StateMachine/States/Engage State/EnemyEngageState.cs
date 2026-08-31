@@ -43,7 +43,7 @@ public class EnemyEngageState : EnemyCompositeState
         if (_isDamaged)
             return;
 
-        _nextAttackTime += Time.deltaTime;
+        _nextAttackTime += CombatTimeController.DeltaTime;
 
         if (Core.TargetTransform == null)
         {
@@ -57,7 +57,7 @@ public class EnemyEngageState : EnemyCompositeState
         direction.y = 0f;
         Core.Rotator.RotateToward(direction);
 
-        _decisionTime -= Time.deltaTime;
+        _decisionTime -= CombatTimeController.DeltaTime;
 
         if (_decisionTime <= 0f)
         {

@@ -7,9 +7,16 @@ public class PlayerPerfectDodgeDetector : MonoBehaviour
     [SerializeField] private PlayerCore _player;
     [SerializeField] private EnemyCore[] _enemies;
 
-    private void Awake()
+    private void OnEnable()
     {
-        _player.OnPerfectDodgeCheck += IsPlayerPerfectDodge;
+        if (_player != null)
+            _player.OnPerfectDodgeCheck += IsPlayerPerfectDodge;
+    }
+
+    private void OnDisable()
+    {
+        if (_player != null)
+            _player.OnPerfectDodgeCheck -= IsPlayerPerfectDodge;
     }
 
     private EnemyCore IsPlayerPerfectDodge()
@@ -19,7 +26,7 @@ public class PlayerPerfectDodgeDetector : MonoBehaviour
         List<EnemyCore> sortedEnemies = GetEnemiesByDistance(_player.transform, _enemies);
         foreach (var enemy in sortedEnemies)
         {
-            if (enemy != null && enemy.IsPlayerInEnemyAttackRange())
+            if (enemy != null && enemy.isActiveAndEnabled && enemy.CurrentHP > 0f && enemy.IsPlayerInEnemyAttackRange())
             {
                 return enemy;
             }

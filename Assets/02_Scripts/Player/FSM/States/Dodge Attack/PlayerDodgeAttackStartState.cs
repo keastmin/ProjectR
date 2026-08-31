@@ -6,7 +6,7 @@ public class PlayerDodgeAttackStartState : PlayerDodgeAttackState
 
     protected override string AnimationTrigger => "IsDodgeAttack";
 
-    protected override PlayerStateBase NextState => throw new System.NotImplementedException();
+    protected override PlayerStateBase NextState => Core.StateMachine.DodgeAttackLoopState;
 
     public PlayerDodgeAttackStartState(PlayerCore core) : base(core)
     {
@@ -14,8 +14,14 @@ public class PlayerDodgeAttackStartState : PlayerDodgeAttackState
 
     public override void Enter()
     {
-        // 자신을 Perfect Dodge로 진입시킨 주체의 공격을 한 대상의 Hurtbox를 향해서
-        // 즉시 회전
+        EnemyCore target = Core.DodgeAttackTarget;
+        if (target != null)
+        {
+            Vector3 direction = target.transform.position - Core.transform.position;
+            direction.y = 0f;
+            if (direction.sqrMagnitude > Mathf.Epsilon)
+                Core.Rotator.RotateImmediately(direction);
+        }
 
         base.Enter();
     }

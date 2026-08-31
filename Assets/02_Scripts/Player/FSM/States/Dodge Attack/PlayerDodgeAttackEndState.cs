@@ -4,9 +4,9 @@ public class PlayerDodgeAttackEndState : PlayerDodgeAttackState
 {
     protected override DirectorID AttackDirectorID => DirectorID.DodgeAttackEnd;
 
-    protected override string AnimationTrigger => "IsIdle";
+    protected override string AnimationTrigger => "IsDodgeAttack";
 
-    protected override PlayerStateBase NextState => throw new System.NotImplementedException();
+    protected override PlayerStateBase NextState => Core.StateMachine.IdleState;
 
     private bool _isEnableOtherBehaviour = false;
 

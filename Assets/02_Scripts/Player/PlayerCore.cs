@@ -1,13 +1,18 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Playables;
+using UnityEngine.Events;
 
 public class PlayerCore : MonoBehaviour, IHitStopParticipant, IDamageable
 {
     [SerializeField] private Camera _mainCamera;
     [SerializeField] private Animator _animator;
     [SerializeField] private PlayerAnimatorController _animatorController;
+
+    [Header("Perfect Dodge")]
+    [SerializeField, InspectorName("Slow Motion Settings")] private PerfectDodgeSettings _perfectDodge = new();
+    [SerializeField] private UnityEvent _onPerfectDodgeStarted;
+    [SerializeField] private UnityEvent _onPerfectDodgeEnded;
+    [SerializeField] private UnityEvent _onDodgeAttackStarted;
 
     // 컴포넌트
     private TimelineDirectorContainer _directorContainer;
@@ -23,9 +28,9 @@ public class PlayerCore : MonoBehaviour, IHitStopParticipant, IDamageable
     private PlayerStateMachine _stateMachine;
     private DirectionCalculator _dirCalculator;
 
-    private readonly List<PlayableSpeedSnapshot> _hitStoppedPlayables = new();
     private bool _isHitStopped;
-    private float _animatorSpeedBeforeHitStop = 1f;
+    private bool _isStartingDodgeAttack;
+    private float _baseAnimatorSpeed;
 
     // 프로퍼티
     public Camera MainCamera => _mainCamera;
@@ -41,16 +46,24 @@ public class PlayerCore : MonoBehaviour, IHitStopParticipant, IDamageable
     public PlayerStateMachine StateMachine => _stateMachine;
     public DirectionCalculator DirCalculator => _dirCalculator;
     public bool IsHitStopped => _isHitStopped;
+    public bool IsPerfectDodgeWindowOpen { get; private set; }
+    public bool IsInvulnerable => IsPerfectDodgeWindowOpen || _isStartingDodgeAttack || _stateMachine?.IsInvulnerable == true;
+    public EnemyCore PerfectDodgeSource { get; private set; }
+    public EnemyCore DodgeAttackTarget { get; private set; }
 
     // 캐싱
     public DamageData LastDamageData { get; private set; } // 마지막에 피해를 입은 데이터
 
     // 이벤트
     public event Action<DamageData> OnDamaged; // 피해를 입었을 때 호출하는 이벤트
+    public event Action<EnemyCore> OnPerfectDodgeStarted;
+    public event Action OnPerfectDodgeEnded;
+    public event Action<EnemyCore> OnDodgeAttackStarted;
     public Func<EnemyCore> OnPerfectDodgeCheck; // 완벽 회피라면 완벽회피를 하게 한 대상을 반환 
 
     private void Awake()
     {
+        _baseAnimatorSpeed = _animator.speed;
         // 애니메이터 초기화
         _animatorController.OnAnimationTick += OnAnimationTickLoop; // OnAnimatorMove 틱에 작동하는 함수
 
@@ -65,6 +78,13 @@ public class PlayerCore : MonoBehaviour, IHitStopParticipant, IDamageable
         TryGetComponent(out _targetDetector);
         _stateMachine = new PlayerStateMachine(this);
         _dirCalculator = new DirectionCalculator();
+        CombatVfxTime.RegisterHierarchy(gameObject);
+    }
+
+    private void OnEnable()
+    {
+        CombatTimeController.ScaleChanged += ApplyCombatSpeed;
+        ApplyCombatSpeed(CombatTimeController.Scale);
     }
 
     private void Start()
@@ -77,6 +97,10 @@ public class PlayerCore : MonoBehaviour, IHitStopParticipant, IDamageable
 
     private void Update()
     {
+        // 입력은 슬로우 배율과 무관하게 먼저 처리합니다. 반격은 기존 히트스탑을 해제하지 않습니다.
+        if (IsPerfectDodgeWindowOpen && _inputCollector.IsInputAttack && TryBeginDodgeAttack())
+            return;
+
         if (_isHitStopped)
             return;
 
@@ -109,7 +133,11 @@ public class PlayerCore : MonoBehaviour, IHitStopParticipant, IDamageable
 
     private void OnDisable()
     {
+        EndPerfectDodge(true);
+        DodgeAttackTarget = null;
         EndHitStop();
+        CombatTimeController.ScaleChanged -= ApplyCombatSpeed;
+        ApplyCombatSpeed(1f);
     }
 
     public void BeginHitStop()
@@ -121,24 +149,7 @@ public class PlayerCore : MonoBehaviour, IHitStopParticipant, IDamageable
         _stateMachine.ClearAccumulatedMotion();
         _mover.SetHitStopped(true);
 
-        _animatorSpeedBeforeHitStop = _animator.speed;
-        _animator.speed = 0f;
-
-        _hitStoppedPlayables.Clear();
-        foreach (PlayableDirector director in _directorContainer.Directors.Values)
-        {
-            if (director == null || director.state != PlayState.Playing || !director.playableGraph.IsValid())
-                continue;
-
-            PlayableGraph graph = director.playableGraph;
-            int rootPlayableCount = graph.GetRootPlayableCount();
-            for (int i = 0; i < rootPlayableCount; i++)
-            {
-                Playable rootPlayable = graph.GetRootPlayable(i);
-                _hitStoppedPlayables.Add(new PlayableSpeedSnapshot(rootPlayable, rootPlayable.GetSpeed()));
-                rootPlayable.SetSpeed(0d);
-            }
-        }
+        ApplyCombatSpeed(CombatTimeController.Scale);
     }
 
     public void EndHitStop()
@@ -147,22 +158,26 @@ public class PlayerCore : MonoBehaviour, IHitStopParticipant, IDamageable
             return;
 
         _isHitStopped = false;
-        _animator.speed = _animatorSpeedBeforeHitStop;
         _mover.SetHitStopped(false);
+        ApplyCombatSpeed(CombatTimeController.Scale);
+    }
 
-        for (int i = 0; i < _hitStoppedPlayables.Count; i++)
-        {
-            PlayableSpeedSnapshot snapshot = _hitStoppedPlayables[i];
-            if (snapshot.Playable.IsValid())
-                snapshot.Playable.SetSpeed(snapshot.Speed);
-        }
-
-        _hitStoppedPlayables.Clear();
+    private void ApplyCombatSpeed(float scale)
+    {
+        float effectiveScale = _isHitStopped ? 0f : scale;
+        _animator.speed = _baseAnimatorSpeed * effectiveScale;
+        _directorContainer.SetCombatSpeed(effectiveScale);
     }
 
     // 피해를 입음
     public bool TryTakeDamage(DamageData damageData)
     {
+        // 피해 기록, 피격 이벤트, 슬로우 해제보다 먼저 거부합니다.
+        // 호출자도 false를 받아 이 타격의 히트스탑을 발생시키지 않습니다.
+        if (IsInvulnerable)
+            return false;
+
+        EndPerfectDodge(true);
         LastDamageData = damageData;
         OnDamaged?.Invoke(damageData);
 
@@ -177,15 +192,57 @@ public class PlayerCore : MonoBehaviour, IHitStopParticipant, IDamageable
         return enemyCore != null;
     }
 
-    private readonly struct PlayableSpeedSnapshot
+    public void BeginPerfectDodge(EnemyCore source)
     {
-        public readonly Playable Playable;
-        public readonly double Speed;
-
-        public PlayableSpeedSnapshot(Playable playable, double speed)
-        {
-            Playable = playable;
-            Speed = speed;
-        }
+        if (source == null || !source.isActiveAndEnabled || source.CurrentHP <= 0f)
+            return;
+        PerfectDodgeSource = source;
+        IsPerfectDodgeWindowOpen = true;
+        CombatTimeController.Begin(this, _perfectDodge);
+        OnPerfectDodgeStarted?.Invoke(source);
+        _onPerfectDodgeStarted?.Invoke();
     }
+
+    public void EndPerfectDodge(bool immediate = false)
+    {
+        bool wasOpen = IsPerfectDodgeWindowOpen;
+        IsPerfectDodgeWindowOpen = false;
+        PerfectDodgeSource = null;
+        CombatTimeController.End(this, _perfectDodge, immediate);
+        if (!wasOpen)
+            return;
+        OnPerfectDodgeEnded?.Invoke();
+        _onPerfectDodgeEnded?.Invoke();
+    }
+
+    public bool TryBeginDodgeAttack()
+    {
+        if (!IsPerfectDodgeWindowOpen)
+            return false;
+        EnemyCore target = PerfectDodgeSource;
+        if (target == null || !target.isActiveAndEnabled || target.CurrentHP <= 0f)
+        {
+            EndPerfectDodge(true);
+            return false;
+        }
+
+        // Exit가 완벽 회피 데이터를 정리하기 전에 반격 대상부터 넘겨받습니다.
+        DodgeAttackTarget = target;
+        // 종료 이벤트를 알리는 순간에도 회피 → 반격 사이에 무적 공백을 만들지 않습니다.
+        _isStartingDodgeAttack = true;
+        try
+        {
+            EndPerfectDodge(true);
+            StateMachine.Transition(StateMachine.DodgeAttackStartState);
+        }
+        finally
+        {
+            _isStartingDodgeAttack = false;
+        }
+        OnDodgeAttackStarted?.Invoke(target);
+        _onDodgeAttackStarted?.Invoke();
+        return true;
+    }
+
+    public void ClearDodgeAttackTarget() => DodgeAttackTarget = null;
 }

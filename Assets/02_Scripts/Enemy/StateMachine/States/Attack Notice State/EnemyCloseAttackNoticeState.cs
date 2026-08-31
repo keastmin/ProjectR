@@ -25,7 +25,7 @@ public class EnemyCloseAttackNoticeState : EnemyAttackNoticeState
 
     public override void UpdateTick()
     {
-        _currentTime += Time.deltaTime;
+        _currentTime += CombatTimeController.DeltaTime;
         if(_currentTime >= _attackSO1.AttackAnimationTransitionTime)
         {
             Core.StateMachine.Transition(Core.StateMachine.CloseAttackState);

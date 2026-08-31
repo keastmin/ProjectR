@@ -3,6 +3,7 @@ using UnityEngine.Playables;
 
 public abstract class PlayerDodgeAttackState : PlayerStateBase
 {
+    public override bool IsInvulnerable => true;
     protected abstract DirectorID AttackDirectorID { get; }
     protected abstract string AnimationTrigger { get; }
     protected abstract PlayerStateBase NextState{ get; }
@@ -28,12 +29,13 @@ public abstract class PlayerDodgeAttackState : PlayerStateBase
         Core.Animator.SetTrigger(AnimationTrigger);
 
         // 타임라인 재생
-        _director.time = 0f;
-        _director.Play();
+        Core.DirectorContainer.Play(AttackDirectorID);
     }
 
     public override void UpdateTick()
     {
+        if (IsDamaged)
+            return;
         if (_isAnimationEnd)
         {
             Core.StateMachine.Transition(NextState);
@@ -43,16 +45,21 @@ public abstract class PlayerDodgeAttackState : PlayerStateBase
 
     public override void FixedTick()
     {
+        if (IsDamaged)
+            return;
         MoveRootMotionAlongFacingDirection();
     }
 
     public override void AnimatorTick()
     {
+        if (IsDamaged)
+            return;
         AnimDeltaPos += Core.Animator.deltaPosition;
     }
 
     public override void Exit()
     {
+        Core.AttackInstanceContainer.ClearDamagedTargets();
         // 초기화
         _isAnimationEnd = false;
 
@@ -73,4 +80,5 @@ public abstract class PlayerDodgeAttackState : PlayerStateBase
     {
         _isAnimationEnd = true;
     }
+
 }

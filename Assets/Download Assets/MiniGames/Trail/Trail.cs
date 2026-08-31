@@ -60,6 +60,9 @@ namespace Tiny
 
 		Coroutine update = null;
 
+		// Runtime playback multiplier; defaults preserve the package's original behaviour.
+		public float TimeScale { get; set; } = 1f;
+
 		/// <summary>
 		/// The array of Vector3 points to connect.
 		/// </summary>
@@ -176,10 +179,15 @@ namespace Tiny
 			YieldInstruction wait = new WaitForFixedUpdate();
 
 			Action action = corner > 0 ? SetVerticesAndCorner : SetVertices;
+			float elapsed = 0f;
 
 			while (true)
 			{
 				yield return wait;
+				elapsed += Time.fixedDeltaTime * Mathf.Max(0f, TimeScale);
+				if (elapsed < Time.fixedDeltaTime)
+					continue;
+				elapsed %= Time.fixedDeltaTime;
 				action();
 				cacheTM.hasChanged = false;
 			}

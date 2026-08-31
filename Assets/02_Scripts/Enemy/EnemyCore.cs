@@ -24,7 +24,7 @@ public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
     private EnemyHitboxPool _hitboxPool;
     private EnemyAttackSimulator _attackSimulator;
     private bool _isHitStopped;
-    private float _animatorSpeedBeforeHitStop = 1f;
+    private float _baseAnimatorSpeed;
 
     public float CurrentHP => _currentHP;
     public Animator Animator => _animatorCallback.Animator;
@@ -48,6 +48,7 @@ public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
 
     private void Awake()
     {
+        _baseAnimatorSpeed = Animator.speed;
         // 공격 데이터 저장
         AttackDataDictionary = new Dictionary<EnemyAttackID, EnemyAttackSO>();
         foreach (var so in _attackSOs)
@@ -65,6 +66,18 @@ public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
         _stateMachine = new EnemyStateMachine(this);
         _animatorCallback.OnAnimatorMoveAction += AnimatorUpdate;
         _animationEvent.OnAttack += HandleAttack;
+        CombatVfxTime.RegisterHierarchy(gameObject);
+    }
+
+    private void OnEnable()
+    {
+        CombatTimeController.ScaleChanged += ApplyCombatSpeed;
+        ApplyCombatSpeed(CombatTimeController.Scale);
+    }
+
+    private void ApplyCombatSpeed(float scale)
+    {
+        Animator.speed = _baseAnimatorSpeed * (_isHitStopped ? 0f : scale);
     }
 
     private void Start()
@@ -107,6 +120,8 @@ public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
     private void OnDisable()
     {
         EndHitStop();
+        CombatTimeController.ScaleChanged -= ApplyCombatSpeed;
+        ApplyCombatSpeed(1f);
     }
 
     public bool TryTakeDamage(DamageData damageData)
@@ -135,8 +150,7 @@ public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
         _stateMachine.ClearAccumulatedMotion();
         _mover.SetHitStopped(true);
 
-        _animatorSpeedBeforeHitStop = Animator.speed;
-        Animator.speed = 0f;
+        ApplyCombatSpeed(CombatTimeController.Scale);
     }
 
     public void EndHitStop()
@@ -145,7 +159,7 @@ public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
             return;
 
         _isHitStopped = false;
-        Animator.speed = _animatorSpeedBeforeHitStop;
+        ApplyCombatSpeed(CombatTimeController.Scale);
         _mover.SetHitStopped(false);
     }
 

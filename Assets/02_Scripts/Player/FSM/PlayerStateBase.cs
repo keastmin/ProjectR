@@ -6,6 +6,7 @@ public class PlayerStateBase
     protected Vector3 AnimDeltaPos = Vector3.zero;
 
     protected bool IsDamaged { get; private set; } = false;
+    public virtual bool IsInvulnerable => false;
 
     public PlayerStateBase(PlayerCore player)
     {
@@ -14,6 +15,7 @@ public class PlayerStateBase
 
     public virtual void Enter()
     {
+        ClearAccumulatedMotion();
         // 초기화
         IsDamaged = false;
 
@@ -43,6 +45,7 @@ public class PlayerStateBase
 
     public virtual void Exit()
     {
+        ClearAccumulatedMotion();
         // 초기화
         IsDamaged = false;
 

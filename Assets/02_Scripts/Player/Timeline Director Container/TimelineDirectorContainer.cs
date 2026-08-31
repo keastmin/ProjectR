@@ -11,9 +11,15 @@ public class TimelineDirectorContainer : MonoBehaviour
 
     private readonly Dictionary<DirectorID, HitStopParticleMode> _particleModes = new();
     private readonly List<ParticleControlSetting> _particleControlSettings = new();
+    private readonly Dictionary<Playable, double> _basePlayableSpeeds = new();
+    private readonly List<Playable> _invalidPlayables = new();
+    private float _combatSpeed = 1f;
 
     public void InitTimelineDirectorContainer()
     {
+        foreach (var previous in Directors.Values)
+            if (previous != null)
+                previous.played -= OnDirectorPlayed;
         Directors.Clear();
         _particleModes.Clear();
 
@@ -21,6 +27,8 @@ public class TimelineDirectorContainer : MonoBehaviour
         {
             Directors.Add(info.ID, info.Director);
             _particleModes.Add(info.ID, info.ParticleMode);
+            if (info.Director != null)
+                info.Director.played += OnDirectorPlayed;
         }
     }
 
@@ -39,6 +47,7 @@ public class TimelineDirectorContainer : MonoBehaviour
         {
             director.time = 0d;
             director.Play();
+            ApplyDirectorSpeed(director);
         }
         finally
         {
@@ -55,10 +64,10 @@ public class TimelineDirectorContainer : MonoBehaviour
 
         bool timelineControlsParticles = mode == HitStopParticleMode.FreezeWithHitStop;
         foreach (TrackAsset rootTrack in timeline.GetRootTracks())
-            ConfigureTrackParticleControl(rootTrack, timelineControlsParticles);
+            ConfigureTrackParticleControl(rootTrack, timelineControlsParticles, director);
     }
 
-    private void ConfigureTrackParticleControl(TrackAsset track, bool timelineControlsParticles)
+    private void ConfigureTrackParticleControl(TrackAsset track, bool timelineControlsParticles, PlayableDirector director)
     {
         foreach (TimelineClip clip in track.GetClips())
         {
@@ -67,10 +76,52 @@ public class TimelineDirectorContainer : MonoBehaviour
 
             _particleControlSettings.Add(new ParticleControlSetting(controlAsset, controlAsset.updateParticle));
             controlAsset.updateParticle = timelineControlsParticles;
+            GameObject source = controlAsset.sourceGameObject.Resolve(director);
+            if (source != null)
+                CombatVfxTime.RegisterHierarchy(source, timelineControlsParticles);
         }
 
         foreach (TrackAsset childTrack in track.GetChildTracks())
-            ConfigureTrackParticleControl(childTrack, timelineControlsParticles);
+            ConfigureTrackParticleControl(childTrack, timelineControlsParticles, director);
+    }
+
+    public void SetCombatSpeed(float speed)
+    {
+        _combatSpeed = speed;
+        _invalidPlayables.Clear();
+        foreach (var playable in _basePlayableSpeeds.Keys)
+            if (!playable.IsValid())
+                _invalidPlayables.Add(playable);
+        foreach (var playable in _invalidPlayables)
+            _basePlayableSpeeds.Remove(playable);
+        foreach (var director in Directors.Values)
+            ApplyDirectorSpeed(director);
+    }
+
+    private void OnDirectorPlayed(PlayableDirector director) => ApplyDirectorSpeed(director);
+
+    private void ApplyDirectorSpeed(PlayableDirector director)
+    {
+        if (director == null || !director.playableGraph.IsValid())
+            return;
+        var graph = director.playableGraph;
+        for (int i = 0; i < graph.GetRootPlayableCount(); i++)
+        {
+            var root = graph.GetRootPlayable(i);
+            if (!_basePlayableSpeeds.TryGetValue(root, out double baseSpeed))
+            {
+                baseSpeed = root.GetSpeed();
+                _basePlayableSpeeds.Add(root, baseSpeed);
+            }
+            root.SetSpeed(baseSpeed * _combatSpeed);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        foreach (var director in Directors.Values)
+            if (director != null)
+                director.played -= OnDirectorPlayed;
     }
 
     private void RestoreParticleControlSettings()

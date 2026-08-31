@@ -6,7 +6,7 @@ public class PlayerDodgeAttackLoopState : PlayerDodgeAttackState
 
     protected override string AnimationTrigger => "IsDodgeAttack";
 
-    protected override PlayerStateBase NextState => throw new System.NotImplementedException();
+    protected override PlayerStateBase NextState => Core.StateMachine.DodgeAttackEndState;
 
     public PlayerDodgeAttackLoopState(PlayerCore core) : base(core)
     {

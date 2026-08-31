@@ -106,6 +106,9 @@ public class PlayerRunAttackState : PlayerStateBase
         Core.AnimationEvent.OnEnableOtherBehaviour -= SetEnableOtherBehaviour;
         Core.AnimationEvent.OnAnimationEnd -= SetTransitionIdle;
 
+        // 애니메이션 초기화
+        Core.Animator.ResetTrigger("IsRunAttack");
+
         base.Exit();
     }
 

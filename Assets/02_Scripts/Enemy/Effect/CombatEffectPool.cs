@@ -36,13 +36,13 @@ public sealed class CombatEffectPool : MonoBehaviour
 
     private void LateUpdate()
     {
-        float now = Time.time;
         for (int i = _activeEffects.Count - 1; i >= 0; i--)
         {
             PooledEffect effect = _activeEffects[i];
             effect.UpdateFollowTransform();
+            effect.AdvanceTime(CombatTimeController.DeltaTime);
 
-            if (now >= effect.ReturnTime)
+            if (effect.RemainingTime <= 0f)
                 ReturnToPool(effect);
         }
     }
@@ -137,6 +137,7 @@ public sealed class CombatEffectPool : MonoBehaviour
     private PooledEffect CreateEffect(EffectPool pool)
     {
         GameObject instance = Instantiate(pool.Info.Prefab, _container);
+        CombatVfxTime.RegisterHierarchy(instance);
         instance.name = $"{pool.Info.Prefab.name} (Pooled)";
 
         PooledEffect effect = new PooledEffect(instance, pool);
@@ -190,7 +191,7 @@ public sealed class CombatEffectPool : MonoBehaviour
 
         public readonly EffectPool Owner;
         public float StartTime { get; private set; }
-        public float ReturnTime { get; private set; }
+        public float RemainingTime { get; private set; }
         public bool HasPlayableComponent => _particleSystems.Length > 0 || _visualEffects.Length > 0;
 
         public PooledEffect(GameObject gameObject, EffectPool owner)
@@ -227,8 +228,13 @@ public sealed class CombatEffectPool : MonoBehaviour
             }
 
             StartTime = Time.time;
-            ReturnTime = StartTime + duration;
+            RemainingTime = duration;
+            // VFX Graph의 Reinit 이후에도 현재 속도를 보장합니다.
+            foreach (var clock in _gameObject.GetComponentsInChildren<CombatVfxTime>(true))
+                clock.ApplyScale(CombatTimeController.Scale);
         }
+
+        public void AdvanceTime(float deltaTime) => RemainingTime -= deltaTime;
 
         public void UpdateFollowTransform()
         {

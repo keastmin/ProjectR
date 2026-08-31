@@ -27,7 +27,7 @@ public class EnemyRotator : MonoBehaviour
     public void RotateLerp(Vector3 direction)
     {
         Quaternion targetRotation = Quaternion.LookRotation(direction, Vector3.up);
-        _facingRotation = Quaternion.Slerp(_facingRotation, targetRotation, _rotationLerpSpeed * Time.deltaTime);
+        _facingRotation = Quaternion.Slerp(_facingRotation, targetRotation, _rotationLerpSpeed * CombatTimeController.DeltaTime);
     }
 
     public void RotateToward(Vector3 direction)
@@ -41,7 +41,7 @@ public class EnemyRotator : MonoBehaviour
             return;
 
         Quaternion targetRotation = Quaternion.LookRotation(direction, Vector3.up);
-        _facingRotation = Quaternion.RotateTowards(_facingRotation, targetRotation, rotationTowardSpeed * Time.deltaTime);
+        _facingRotation = Quaternion.RotateTowards(_facingRotation, targetRotation, rotationTowardSpeed * CombatTimeController.DeltaTime);
     }
 
     public void RotateImmediately(Vector3 direction)

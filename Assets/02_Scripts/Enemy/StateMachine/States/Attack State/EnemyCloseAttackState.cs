@@ -38,6 +38,12 @@ public class EnemyCloseAttackState : EnemyAttackState
 
     private void SetAttackNoticeCollider(int index)
     {
+        if (index < 0)
+        {
+            Core.ClearAttackNoticeCollider();
+            return;
+        }
+
         Collider[] noticeColliders = { Core.CloseAttackNotiveBoxies[index] };
         Core.SetAttackNoticeCollider(noticeColliders);
     }

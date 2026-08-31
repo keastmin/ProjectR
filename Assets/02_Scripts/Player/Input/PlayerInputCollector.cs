@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+[DefaultExecutionOrder(-8000)]
 public class PlayerInputCollector : MonoBehaviour
 {
     private string _moveName = "Move";

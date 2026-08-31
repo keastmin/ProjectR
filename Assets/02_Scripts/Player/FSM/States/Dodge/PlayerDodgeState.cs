@@ -11,6 +11,8 @@ public abstract class PlayerDodgeState : PlayerStateBase
 
     public override void Enter()
     {
+        base.Enter();
+        Core.AnimationEvent.OnPerfectDodgeEnd += HandlePerfectDodgeEnd;
         // 초기화
         IsPerfectDodge = false;
         IsPerfectDodgeEnd = false;
@@ -23,15 +25,8 @@ public abstract class PlayerDodgeState : PlayerStateBase
         {
             IsPerfectDodge = true;
 
-            Debug.Log(enemy.name);
-
-            // 플레이어, 적 전체, VFX 슬로우 모션 Fade In 진입
-            // 화면 Effect 발동
-            // 플레이어 캐릭터 트레일 연출
-            // 이 모든 것을 여기서 직접 호출하지 않고 Core의 함수를 호출하여 Action을 Invoke를 하는 등 외부에서 느슨하게 호출 가능한 구조를 통해 진행한다.
+            Core.BeginPerfectDodge(enemy);
         }
-
-        base.Enter();
     }
 
     public override void FixedTick()
@@ -53,6 +48,10 @@ public abstract class PlayerDodgeState : PlayerStateBase
 
     public override void Exit()
     {
+        Core.AnimationEvent.OnPerfectDodgeEnd -= HandlePerfectDodgeEnd;
+        // 자연 종료 후 진행 중인 FadeOut은 유지하고, 도중에 다른 상태로 나가면 정리합니다.
+        if (Core.IsPerfectDodgeWindowOpen)
+            Core.EndPerfectDodge(true);
         // 초기화
         IsPerfectDodge = false;
         IsPerfectDodgeEnd = false;
@@ -61,5 +60,13 @@ public abstract class PlayerDodgeState : PlayerStateBase
         Core.Animator.ResetTrigger(AnimationTrigger);
 
         base.Exit();
+    }
+
+    private void HandlePerfectDodgeEnd()
+    {
+        if (!IsPerfectDodge || IsPerfectDodgeEnd)
+            return;
+        IsPerfectDodgeEnd = true;
+        Core.EndPerfectDodge();
     }
 }

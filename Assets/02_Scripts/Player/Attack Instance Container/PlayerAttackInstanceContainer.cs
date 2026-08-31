@@ -9,6 +9,9 @@ public class PlayerAttackInstanceContainer : MonoBehaviour
     [SerializeField] private AttackDamageField _basicAttack4DamageField;
     [SerializeField] private AttackDamageField _runAttack1HitDamageField;
     [SerializeField] private AttackDamageField _runAttack2HitDamageField;
+    [SerializeField] private AttackDamageField _dodgeAttack1HitDamageField;
+    [SerializeField] private AttackDamageField _dodgeAttack2HitDamageField;
+    [SerializeField] private AttackDamageField _dodgeAttackEndDamageField;
 
     [SerializeField] private Transform _basicAttack2GroundCrackTransform;
     [SerializeField] private ParticleSystem _basicAttack2GroundCrackParticle;
