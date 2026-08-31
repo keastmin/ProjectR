@@ -8,7 +8,7 @@ public class EnemyCloseAttackState : EnemyAttackState
 
     public override void AnimatorTick()
     {
-        AnimDeltaPos += (Core.Animator.deltaPosition * 2f);
+        AnimDeltaPos += (Core.Animator.deltaPosition * 2.5f);
     }
 
     public override void Exit()

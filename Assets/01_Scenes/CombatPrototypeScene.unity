@@ -534,6 +534,7 @@ GameObject:
   - component: {fileID: 263956223}
   - component: {fileID: 263956224}
   - component: {fileID: 263956226}
+  - component: {fileID: 263956227}
   - component: {fileID: 263956219}
   m_Layer: 0
   m_Name: Striker
@@ -551,7 +552,7 @@ Transform:
   m_GameObject: {fileID: 263956217}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: 0, y: 0, z: 2}
+  m_LocalPosition: {x: 0, y: 0, z: -0.18}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -568,7 +569,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 263956217}
   serializedVersion: 5
-  m_Mass: 100
+  m_Mass: 500
   m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -602,6 +603,9 @@ MonoBehaviour:
   _maxHP: 10000
   _currentHP: 0
   _animatorCallback: {fileID: 162463060}
+  _attackSOs:
+  - {fileID: 11400000, guid: 38958ae142bcf88468aa05a79a8a8017, type: 2}
+  - {fileID: 11400000, guid: dd48506b54b4e5d419ad9456a44ba365, type: 2}
 --- !u!114 &263956221
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -690,6 +694,21 @@ MonoBehaviour:
   _boxHitboxPoolCount: 5
   _sphereHitboxPoolCount: 5
   _hitboxContainer: {fileID: 1527890312}
+--- !u!114 &263956227
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 263956217}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f68fc944cd22d2408f493196b800800, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyAttackSimulator
+  _attackSOs:
+  - {fileID: 11400000, guid: 38958ae142bcf88468aa05a79a8a8017, type: 2}
+  - {fileID: 11400000, guid: dd48506b54b4e5d419ad9456a44ba365, type: 2}
 --- !u!1 &326004369
 GameObject:
   m_ObjectHideFlags: 0
@@ -3481,7 +3500,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Tiny.Trail
   material: {fileID: 2100000, guid: 2ff5af7eb1332ce4891b8c2eaa0bbb49, type: 2}
   duration: 0.1
-  corner: 5
+  corner: 10
   loop: 0
   points:
   - {x: -0.16694789, y: 0.020338148, z: -0.003774807}
@@ -5101,6 +5120,37 @@ Transform:
   - {fileID: 1241148057}
   m_Father: {fileID: 263956218}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1983840731
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1983840732}
+  m_Layer: 0
+  m_Name: Attack Notice Boxies
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1983840732
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1983840731}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1649345504701299709}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2045637646
 GameObject:
   m_ObjectHideFlags: 0
@@ -6369,6 +6419,7 @@ Transform:
   - {fileID: 7353986299249664105}
   - {fileID: 4526188928752401354}
   - {fileID: 1527890312}
+  - {fileID: 1983840732}
   m_Father: {fileID: 762812687}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1651631994568092036
@@ -11070,12 +11121,7 @@ Animator:
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
   m_AnimatePhysics: 0
-  m_WarningMessage: "\nBinding warning: Some generic clip(s) animate transforms that
-    are already bound by a Humanoid avatar. These transforms can only be changed
-    by Humanoid clips.\n\tTransform 'clavicle_r'\n\tTransform 'index_metacarpal_l'\n\tTransform
-    'pinky_01_l'\n\tTransform 'lowerarm_r'\n\tTransform 'ring_02_l'\n\tTransform
-    'index_metacarpal_r'\n\tTransform 'root'\n\tTransform 'spine_04'\n\tTransform
-    'ring_metacarpal_r'\n\tTransform 'middle_01_r'\n\tand more ..."
+  m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0

@@ -1162,7 +1162,7 @@
     "m_CustomBinding": "",
     "m_BareResource": false,
     "m_Texture": {
-        "m_SerializedTexture": "{\"texture\":{\"fileID\":2800000,\"guid\":\"764ece808ae6d1a4db3f73542daac4a1\",\"type\":3}}",
+        "m_SerializedTexture": "{\"texture\":{\"fileID\":2800000,\"guid\":\"ced604422f8779545b2feb9a8fb78fd3\",\"type\":3}}",
         "m_Guid": ""
     },
     "m_DefaultType": 0

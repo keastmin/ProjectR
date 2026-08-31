@@ -467539,15 +467539,15 @@ AnimationClip:
   m_HasGenericRootTransform: 0
   m_HasMotionFloatCurves: 0
   m_Events:
-  - time: 0
-    functionName: OnAttackNotice
+  - time: 0.16666667
+    functionName: OnSwordTrailEffectActive
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
-  - time: 0.16666667
-    functionName: OnSwordTrailEffectActive
+  - time: 0.21666667
+    functionName: OnAttackWindowOff
     data: 
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
@@ -467557,6 +467557,13 @@ AnimationClip:
     functionName: OnAttack
     data: 
     objectReferenceParameter: {fileID: 11400000, guid: 38958ae142bcf88468aa05a79a8a8017, type: 2}
+    floatParameter: 0
+    intParameter: 0
+    messageOptions: 0
+  - time: 0.25
+    functionName: OnAttackWindowOn
+    data: 
+    objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0
     messageOptions: 0

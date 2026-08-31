@@ -30,4 +30,14 @@ public class EnemyAnimationEventSender : MonoBehaviour
     {
         _animEvent.AttackNotice();
     }
+
+    public void OnAttackWindowOn()
+    {
+        _animEvent.AttackWindowActive(true);
+    }
+
+    public void OnAttackWindowOff()
+    {
+        _animEvent.AttackWindowActive(false);
+    }
 }
