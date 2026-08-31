@@ -4866,6 +4866,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1428623402937711696}
+  - component: {fileID: 7202991159781366627}
   - component: {fileID: 4458304778449931968}
   - component: {fileID: 2548860344523996477}
   m_Layer: 0
@@ -4892,6 +4893,33 @@ Transform:
   - {fileID: 8181395913172500055}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7202991159781366627
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2602250327734018963}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c6751fd7002a544a930cb079c0e0577, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ProjectileHitbox
+  _damage: 2
+  _damageInterval: 0.2
+  _hitStopFrame: 1
+  _targetLayers:
+    serializedVersion: 2
+    m_Bits: 64
+  _showPreview: 1
+  _slashParticles:
+  - {fileID: 485169112735436587}
+  - {fileID: 4104811956153795766}
+  _sizeMultiplier: {x: 1, y: 1, z: 1}
+  _padding: {x: 0.05, y: 0.05, z: 0.05}
+  _minimumSize: {x: 0.1, y: 0.1, z: 0.1}
+  _previewColor: {r: 0.2, g: 1, b: 0.3, a: 1}
+  _showSourceBounds: 0
 --- !u!198 &4458304778449931968
 ParticleSystem:
   m_ObjectHideFlags: 0

@@ -25,6 +25,12 @@ public class EnemyCloseAttackNoticeState : EnemyAttackNoticeState
 
     public override void UpdateTick()
     {
+        Vector3 direction =
+            Core.TargetTransform.position - Core.transform.position;
+
+        direction.y = 0f;
+        Core.Rotator.RotateToward(direction);
+
         _currentTime += CombatTimeController.DeltaTime;
         if(_currentTime >= _attackSO1.AttackAnimationTransitionTime)
         {

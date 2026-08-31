@@ -101,11 +101,22 @@ public class PlayerAnimationEvent : MonoBehaviour
 
     public void OnDodgeAttackProjectileEffect()
     {
-        CreateEffect(_projectileTransform, _dodgeAttackProjectile);
+        ParticleSystem projectile = Instantiate(
+            _dodgeAttackProjectile, _projectileTransform.position, _projectileTransform.rotation);
+        if (projectile.TryGetComponent(out ProjectileHitbox hitbox))
+        {
+            PlayerCore owner = GetComponentInParent<PlayerCore>();
+            hitbox.Initialize(owner != null ? owner.gameObject : gameObject);
+        }
     }
 
     private void CreateEffect(Transform createTransform, ParticleSystem particle)
     {
         Instantiate(particle, createTransform);
+    }
+
+    private void CreateEffect(Vector3 position, Quaternion rotation, ParticleSystem particle)
+    {
+        Instantiate(particle, position, rotation);
     }
 }

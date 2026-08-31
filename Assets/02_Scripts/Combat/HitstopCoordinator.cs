@@ -46,6 +46,22 @@ public sealed class HitstopCoordinator : MonoBehaviour
         }
     }
 
+    // 공격자와 VFX는 건드리지 않고, 실제 피해를 받은 대상만 기준값 + 1프레임 정지합니다.
+    public static void RequestVictimsOnly(
+        IReadOnlyList<IHitStopParticipant> victims,
+        int baseFrameCount)
+    {
+        if (baseFrameCount <= 0 || victims == null || victims.Count == 0)
+            return;
+
+        HitstopCoordinator coordinator = EnsureInstance();
+        double releaseTime = Time.realtimeSinceStartupAsDouble
+            + ((double)baseFrameCount + 1d) / CombatFrameRate;
+
+        for (int i = 0; i < victims.Count; i++)
+            coordinator.Hold(victims[i], releaseTime);
+    }
+
     private static HitstopCoordinator EnsureInstance()
     {
         if (_instance != null)

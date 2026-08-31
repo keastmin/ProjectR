@@ -12,6 +12,7 @@ public class PlayerAttackInstanceContainer : MonoBehaviour
     [SerializeField] private AttackDamageField _dodgeAttack1HitDamageField;
     [SerializeField] private AttackDamageField _dodgeAttack2HitDamageField;
     [SerializeField] private AttackDamageField _dodgeAttackEndDamageField;
+    [SerializeField] private AttackDamageField _dodgeAttackEndRangeDamageField;
 
     [SerializeField] private Transform _basicAttack2GroundCrackTransform;
     [SerializeField] private ParticleSystem _basicAttack2GroundCrackParticle;
@@ -57,7 +58,7 @@ public class PlayerAttackInstanceContainer : MonoBehaviour
     // 기본 공격 3 해시하지 않고 데미지 주기
     public void OnGiveDamageBasicAttack3NoHasing()
     {
-        GiveDamageFieldNoHasing(_basicAttack3DamageField);
+        GiveDamageFieldNoHashing(_basicAttack3DamageField);
     }
 
     // 기본 공격 4 해시하고 데미지 주기
@@ -69,19 +70,43 @@ public class PlayerAttackInstanceContainer : MonoBehaviour
     // 기본 공격 4 해시하지 않고 데미지 주기
     public void OnGiveDamageBasicAttack4NoHashing()
     {
-        GiveDamageFieldNoHasing(_basicAttack4DamageField);
+        GiveDamageFieldNoHashing(_basicAttack4DamageField);
     }
 
     // 달리기 공격 1타 데미지 주기
     public void OnGiveDamageRunAttack1HitNoHashing()
     {
-        GiveDamageFieldNoHasing(_runAttack1HitDamageField);
+        GiveDamageFieldNoHashing(_runAttack1HitDamageField);
     }
 
     // 달리기 공격 2타 데미지 주기
     public void OnGiveDamageRunAttack2HitNoHashing()
     {
-        GiveDamageFieldNoHasing(_runAttack2HitDamageField);
+        GiveDamageFieldNoHashing(_runAttack2HitDamageField);
+    }
+
+    // 회피 공격 1타 데미지
+    public void OnGiveDamageDodgeAttack1Hit()
+    {
+        GiveDamageFieldNoHashing(_dodgeAttack1HitDamageField);
+    }
+
+    // 회피 공격 2타 데미지
+    public void OnGiveDamageDodgeAttack2Hit()
+    {
+        GiveDamageFieldNoHashing(_dodgeAttack2HitDamageField);
+    }
+
+    // 회피 공격 막타 데미지
+    public void OnGiveDamageDodgeAttackEndHit()
+    {
+        GiveDamageFieldNoHashing(_dodgeAttackEndDamageField);
+    }
+
+    // 회피 공격 막타 범위 데미지
+    public void OnGiveDamageDodgeAttackEndRangeHit()
+    {
+        GiveDamageFieldNoHashing(_dodgeAttackEndRangeDamageField);
     }
 
     // 데미지를 주는 대상을 해쉬에 추가하면서 공격
@@ -91,7 +116,7 @@ public class PlayerAttackInstanceContainer : MonoBehaviour
     }
 
     // 데미지를 주는 대상을 해쉬에 추가하지 않으면서 공격
-    public void GiveDamageFieldNoHasing(AttackDamageField damageField)
+    public void GiveDamageFieldNoHashing(AttackDamageField damageField)
     {
         GiveDamageField(damageField, rememberDamagedTargets: false);
     }

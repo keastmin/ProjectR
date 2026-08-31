@@ -16,12 +16,18 @@ public class EnemyCloseAttackState : EnemyAttackState
 
     public override void UpdateTick()
     {
+        Vector3 direction =
+            Core.TargetTransform.position - Core.transform.position;
+
+        direction.y = 0f;
+        Core.Rotator.RotateToward(direction);
+
         base.UpdateTick();
     }
 
     public override void AnimatorTick()
     {
-        AnimDeltaPos += (Core.Animator.deltaPosition * 2.5f);
+        AnimDeltaPos += (Core.Animator.deltaPosition * 3f);
     }
 
     public override void Exit()
