@@ -23,6 +23,7 @@ public class PlayerCore : MonoBehaviour, IHitStopParticipant, IDamageable
     private FootPositionDetector _footPositionDetector;
     private PlayerAttackInstanceContainer _attackInstanceContainer;
     private PlayerTargetDetector _targetDetector;
+    private MeshTrailEffect _trailEffect;
 
     // 기능
     private PlayerStateMachine _stateMachine;
@@ -43,6 +44,7 @@ public class PlayerCore : MonoBehaviour, IHitStopParticipant, IDamageable
     public FootPositionDetector FootPosDetector => _footPositionDetector;
     public PlayerAttackInstanceContainer AttackInstanceContainer => _attackInstanceContainer;
     public PlayerTargetDetector TargetDetector => _targetDetector;
+    public MeshTrailEffect TrailEffect => _trailEffect;
     public PlayerStateMachine StateMachine => _stateMachine;
     public DirectionCalculator DirCalculator => _dirCalculator;
     public bool IsHitStopped => _isHitStopped;
@@ -76,6 +78,7 @@ public class PlayerCore : MonoBehaviour, IHitStopParticipant, IDamageable
         TryGetComponent(out _footPositionDetector);
         TryGetComponent(out _attackInstanceContainer);
         TryGetComponent(out _targetDetector);
+        TryGetComponent(out _trailEffect);
         _stateMachine = new PlayerStateMachine(this);
         _dirCalculator = new DirectionCalculator();
         CombatVfxTime.RegisterHierarchy(gameObject);
@@ -201,6 +204,7 @@ public class PlayerCore : MonoBehaviour, IHitStopParticipant, IDamageable
         CombatTimeController.Begin(this, _perfectDodge);
         OnPerfectDodgeStarted?.Invoke(source);
         _onPerfectDodgeStarted?.Invoke();
+        TrailEffect.ActiveDodgeEffect();
     }
 
     public void EndPerfectDodge(bool immediate = false)

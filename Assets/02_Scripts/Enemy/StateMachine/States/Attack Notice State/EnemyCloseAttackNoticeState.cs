@@ -25,8 +25,9 @@ public class EnemyCloseAttackNoticeState : EnemyAttackNoticeState
 
     public override void UpdateTick()
     {
-        Vector3 direction =
-            Core.TargetTransform.position - Core.transform.position;
+        Vector3 direction = Core.TargetTransform != null ?
+            Core.TargetTransform.position - Core.transform.position :
+            Core.Rotator.FacingDirection;
 
         direction.y = 0f;
         Core.Rotator.RotateToward(direction);
