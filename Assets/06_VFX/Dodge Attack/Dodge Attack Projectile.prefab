@@ -4908,6 +4908,7 @@ MonoBehaviour:
   _damage: 2
   _damageInterval: 0.2
   _hitStopFrame: 1
+  _staggerLevel: 2
   _targetLayers:
     serializedVersion: 2
     m_Bits: 64

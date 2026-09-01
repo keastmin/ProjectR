@@ -9,12 +9,15 @@ public class AttackDamageField
     [SerializeField, Min(0f)] private float _damage = 10f;
     [SerializeField, Min(0), Tooltip("60Hz 전투 프레임 기준 플레이어 히트스탑 길이입니다. 적은 자동으로 1프레임 더 정지합니다.")]
     private int _hitStopFrame = 0;
+    [SerializeField, Tooltip("적의 최소 요구 레벨 이상일 때만 피격 상태에 진입합니다. None도 피해와 히트스탑은 그대로 적용됩니다.")]
+    private StaggerLevel _staggerLevel = StaggerLevel.None;
     [SerializeField] private LayerMask _targetLayers = ~0;
     [SerializeField] private QueryTriggerInteraction _triggerInteraction = QueryTriggerInteraction.Collide;
 
     public string Name => _name;
     public float Damage => _damage;
     public int HitStopFrame => _hitStopFrame;
+    public StaggerLevel StaggerLevel => _staggerLevel;
 
     public void DisablePhysicalCollision()
     {

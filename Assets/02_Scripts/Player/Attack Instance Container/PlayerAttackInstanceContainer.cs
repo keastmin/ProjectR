@@ -142,7 +142,11 @@ public class PlayerAttackInstanceContainer : MonoBehaviour
             if (rememberDamagedTargets && !_damagedTargets.Add(damageable))
                 continue;
 
-            DamageData data = new DamageData(gameObject, damageField.Damage, damageField.HitStopFrame);
+            DamageData data = new DamageData(
+                gameObject,
+                damageField.Damage,
+                damageField.HitStopFrame,
+                damageField.StaggerLevel);
             if (!damageable.TryTakeDamage(data))
                 continue;
 

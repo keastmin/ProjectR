@@ -14,6 +14,16 @@ public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
     [SerializeField] private Collider[] _closeAttackNoticeBoxies;
     [SerializeField] private LayerMask _playerHurtboxLayer;
 
+    [Header("Hit Reaction Resistance")]
+    [SerializeField, Tooltip("평상시에 이 레벨 이상의 플레이어 공격이 피격 상태를 발생시킵니다.")]
+    private StaggerLevel _minimumStaggerLevel = StaggerLevel.Level1;
+    [SerializeField, Tooltip("연속 피격 저항 중에는 이 레벨 이상의 공격만 저항을 뚫고 피격 상태를 발생시킵니다.")]
+    private StaggerLevel _resistantMinimumStaggerLevel = StaggerLevel.Level2;
+    [SerializeField, Min(1)] private int _minConsecutiveHitReactions = 2;
+    [SerializeField, Min(1)] private int _maxConsecutiveHitReactions = 4;
+    [SerializeField, Min(0f)] private float _hitReactionChainResetDelay = 1.25f;
+    [SerializeField] private Vector2 _hitReactionResistanceDurationRange = new(1.75f, 2.75f);
+
     private DamageData _lastDamageData;
 
     private EnemyRotator _rotator;
@@ -23,8 +33,15 @@ public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
     private EnemyTargetDetector _targetDetector;
     private EnemyHitboxPool _hitboxPool;
     private EnemyAttackSimulator _attackSimulator;
+    private EnemyAttackTimingController _attackTimingController;
+    private EnemyPositioningController _positioningController;
     private bool _isHitStopped;
     private float _baseAnimatorSpeed;
+    private float _fallbackAttackCooldownRemaining;
+    private float _hitReactionChainRemaining;
+    private float _hitReactionResistanceRemaining;
+    private int _consecutiveHitReactions;
+    private int _nextHitReactionThreshold;
 
     public float CurrentHP => _currentHP;
     public Animator Animator => _animatorCallback.Animator;
@@ -35,6 +52,7 @@ public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
     public EnemyTargetDetector TargetDetector => _targetDetector;
     public EnemyHitboxPool HitboxPool => _hitboxPool;
     public EnemyAttackSimulator AttackSimulator => _attackSimulator;
+    public EnemyPositioningController PositioningController => _positioningController;
     public DamageData LastDamageData => _lastDamageData;
     public bool IsHitStopped => _isHitStopped;
     public Transform TargetTransform => TargetDetector.TargetTransform;
@@ -62,6 +80,8 @@ public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
         TryGetComponent(out _attackSimulator);
 
         _currentHP = _maxHP;
+        _fallbackAttackCooldownRemaining = UnityEngine.Random.Range(1.5f, 3.5f);
+        RollNextHitReactionThreshold();
 
         _stateMachine = new EnemyStateMachine(this);
         _animatorCallback.OnAnimatorMoveAction += AnimatorUpdate;
@@ -73,6 +93,7 @@ public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
     {
         CombatTimeController.ScaleChanged += ApplyCombatSpeed;
         ApplyCombatSpeed(CombatTimeController.Scale);
+        ResolvePositioningController();
     }
 
     private void ApplyCombatSpeed(float scale)
@@ -87,6 +108,8 @@ public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
 
     private void Update()
     {
+        TickCombatTimers();
+
         if (_isHitStopped)
             return;
 
@@ -119,6 +142,8 @@ public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
 
     private void OnDisable()
     {
+        ReleaseAttackPermission();
+        _positioningController?.Unregister(this);
         EndHitStop();
         CombatTimeController.ScaleChanged -= ApplyCombatSpeed;
         ApplyCombatSpeed(1f);
@@ -133,6 +158,116 @@ public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
         _lastDamageData = damageData;
         OnDamaged?.Invoke(damageData);
         return true;
+    }
+
+    public bool ShouldEnterHitReaction(DamageData damageData)
+    {
+        if (_hitReactionResistanceRemaining > 0f)
+            return damageData.StaggerLevel >= _resistantMinimumStaggerLevel;
+
+        if (damageData.StaggerLevel < _minimumStaggerLevel)
+            return false;
+
+        if (_hitReactionChainRemaining <= 0f)
+        {
+            _consecutiveHitReactions = 0;
+            RollNextHitReactionThreshold();
+        }
+
+        _hitReactionChainRemaining = _hitReactionChainResetDelay;
+
+        if (_consecutiveHitReactions >= _nextHitReactionThreshold)
+        {
+            _consecutiveHitReactions = 0;
+            _hitReactionResistanceRemaining = UnityEngine.Random.Range(
+                _hitReactionResistanceDurationRange.x,
+                _hitReactionResistanceDurationRange.y);
+
+            PrioritizeNextAttack();
+            return damageData.StaggerLevel >= _resistantMinimumStaggerLevel;
+        }
+
+        _consecutiveHitReactions++;
+        return true;
+    }
+
+    public bool TryBeginAttack()
+    {
+        if (_attackTimingController != null)
+        {
+            if (!_attackTimingController.IsReadyToAttack(this))
+                return false;
+        }
+        else if (_fallbackAttackCooldownRemaining > 0f)
+        {
+            return false;
+        }
+
+        if (_positioningController != null && !_positioningController.CanBeginAttack(this))
+            return false;
+
+        bool granted;
+
+        if (_attackTimingController != null)
+        {
+            granted = _attackTimingController.TryBeginAttack(this);
+        }
+        else
+        {
+            _fallbackAttackCooldownRemaining = UnityEngine.Random.Range(3.5f, 6.5f);
+            granted = true;
+        }
+
+        if (granted)
+            _positioningController?.NotifyAttackStarted(this);
+
+        return granted;
+    }
+
+    public void ReleaseAttackPermission()
+    {
+        _positioningController?.NotifyAttackEnded(this);
+
+        if (_attackTimingController != null)
+            _attackTimingController.ReleaseAttack(this);
+    }
+
+    public void SetAttackTimingController(EnemyAttackTimingController controller)
+    {
+        if (controller == null || _attackTimingController == controller)
+            return;
+
+        ReleaseAttackPermission();
+        _attackTimingController = controller;
+    }
+
+    public void ClearAttackTimingController(EnemyAttackTimingController controller)
+    {
+        if (_attackTimingController == controller)
+            _attackTimingController = null;
+    }
+
+    public void SetPositioningController(EnemyPositioningController controller)
+    {
+        if (controller == null || _positioningController == controller)
+            return;
+
+        EnemyPositioningController previous = _positioningController;
+        _positioningController = controller;
+        previous?.Unregister(this);
+    }
+
+    public void ClearPositioningController(EnemyPositioningController controller)
+    {
+        if (_positioningController == controller)
+            _positioningController = null;
+    }
+
+    public Vector3 AdjustPositioningMovement(Vector3 desiredVelocity)
+    {
+        return _positioningController != null
+            ? _positioningController.AdjustMovement(this, desiredVelocity)
+            : desiredVelocity;
     }
 
     public void PlayHitReaction(int stateHash)
@@ -218,5 +353,46 @@ public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
     private Vector3 Abs(Vector3 value)
     {
         return new Vector3(Mathf.Abs(value.x), Mathf.Abs(value.y), Mathf.Abs(value.z));
+    }
+
+    private void TickCombatTimers()
+    {
+        if (_isHitStopped)
+            return;
+
+        float deltaTime = CombatTimeController.DeltaTime;
+        _fallbackAttackCooldownRemaining = Mathf.Max(0f, _fallbackAttackCooldownRemaining - deltaTime);
+        _hitReactionChainRemaining = Mathf.Max(0f, _hitReactionChainRemaining - deltaTime);
+        _hitReactionResistanceRemaining = Mathf.Max(0f, _hitReactionResistanceRemaining - deltaTime);
+    }
+
+    private void ResolvePositioningController()
+    {
+        EnemyPositioningController controller = EnemyPositioningController.FindFor(this);
+        controller?.Register(this);
+    }
+
+    private void PrioritizeNextAttack()
+    {
+        _fallbackAttackCooldownRemaining = 0f;
+        _attackTimingController?.PrioritizeAttack(this);
+    }
+
+    private void RollNextHitReactionThreshold()
+    {
+        int min = Mathf.Max(1, _minConsecutiveHitReactions);
+        int max = Mathf.Max(min, _maxConsecutiveHitReactions);
+        _nextHitReactionThreshold = UnityEngine.Random.Range(min, max + 1);
+    }
+
+    private void OnValidate()
+    {
+        _minConsecutiveHitReactions = Mathf.Max(1, _minConsecutiveHitReactions);
+        _maxConsecutiveHitReactions = Mathf.Max(_minConsecutiveHitReactions, _maxConsecutiveHitReactions);
+        _hitReactionChainResetDelay = Mathf.Max(0f, _hitReactionChainResetDelay);
+        _hitReactionResistanceDurationRange.x = Mathf.Max(0f, _hitReactionResistanceDurationRange.x);
+        _hitReactionResistanceDurationRange.y = Mathf.Max(
+            _hitReactionResistanceDurationRange.x,
+            _hitReactionResistanceDurationRange.y);
     }
 }

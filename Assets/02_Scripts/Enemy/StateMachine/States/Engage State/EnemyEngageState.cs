@@ -10,8 +10,6 @@ public class EnemyEngageState : EnemyCompositeState
     private readonly EnemyCombatMoveForwardState _moveForwardState;
     private readonly EnemyCombatMoveBackwardState _moveBackwardState;
 
-    private float _attackCooldown = 5f;
-    private float _nextAttackTime = 0f;
     private float _decisionTime;
     private bool _isDamaged = false;
 
@@ -29,8 +27,6 @@ public class EnemyEngageState : EnemyCompositeState
     {
         // 초기화
         _isDamaged = false;
-        _nextAttackTime = 0f;
-
         // 이벤트 연결
         Core.OnDamaged += SetDamaged;
 
@@ -42,8 +38,6 @@ public class EnemyEngageState : EnemyCompositeState
     {
         if (_isDamaged)
             return;
-
-        _nextAttackTime += CombatTimeController.DeltaTime;
 
         if (Core.TargetTransform == null)
         {
@@ -72,8 +66,6 @@ public class EnemyEngageState : EnemyCompositeState
     {
         // 초기화
         _isDamaged = false;
-        _nextAttackTime = 0f;
-
         // 이벤트 해제
         Core.OnDamaged -= SetDamaged;
 
@@ -82,9 +74,15 @@ public class EnemyEngageState : EnemyCompositeState
 
     private void SelectNextAction()
     {
-        if(_nextAttackTime >= _attackCooldown)
+        if (Core.TryBeginAttack())
         {
             Core.StateMachine.Transition(Core.StateMachine.CloseAttackNoticeState);
+            return;
+        }
+
+        if (Core.PositioningController != null)
+        {
+            SelectPositioningAction(Core.PositioningController.GetRecommendedAction(Core));
             return;
         }
 
@@ -114,13 +112,40 @@ public class EnemyEngageState : EnemyCompositeState
             TransitionSubState(_moveRightState);
     }
 
+    private void SelectPositioningAction(EnemyPositioningAction action)
+    {
+        switch (action)
+        {
+            case EnemyPositioningAction.Advance:
+                TransitionSubState(_moveForwardState);
+                break;
+            case EnemyPositioningAction.Retreat:
+                TransitionSubState(_moveBackwardState);
+                break;
+            case EnemyPositioningAction.StrafeLeft:
+                TransitionSubState(_moveLeftState);
+                break;
+            case EnemyPositioningAction.StrafeRight:
+                TransitionSubState(_moveRightState);
+                break;
+            default:
+                TransitionSubState(_holdState);
+                break;
+        }
+    }
+
     private void ResetDecisionTime()
     {
-        _decisionTime = Random.Range(0.4f, 1.1f);
+        _decisionTime = Core.PositioningController != null
+            ? Random.Range(0.2f, 0.45f)
+            : Random.Range(0.4f, 1.1f);
     }
 
     private void SetDamaged(DamageData damageData)
     {
+        if (!Core.ShouldEnterHitReaction(damageData))
+            return;
+
         _isDamaged = true;
 
         HitDirectionType type = HitDirectionCalculator.GetHitDirection(damageData, Core.transform.position, Core.Rotator.FacingDirection);

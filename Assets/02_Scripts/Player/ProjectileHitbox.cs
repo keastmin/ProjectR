@@ -11,6 +11,8 @@ public class ProjectileHitbox : MonoBehaviour
     private float _damageInterval = 0.2f;
     [SerializeField, Min(0), Tooltip("피해를 받은 적만 이 값 + 1프레임 정지합니다. 0이면 히트스탑을 요청하지 않습니다.")]
     private int _hitStopFrame = 1;
+    [SerializeField, Tooltip("적의 최소 요구 레벨 이상일 때만 피격 상태에 진입합니다. None도 피해와 히트스탑은 그대로 적용됩니다.")]
+    private StaggerLevel _staggerLevel = StaggerLevel.None;
     [SerializeField] private LayerMask _targetLayers = 1 << 6; // Enemy Hurtbox
 
     [Header("Hitbox Shape and Preview")]
@@ -144,7 +146,11 @@ public class ProjectileHitbox : MonoBehaviour
 
         _targetsInCurrentTick.Clear();
         _hitStopVictims.Clear();
-        DamageData damageData = new DamageData(_owner != null ? _owner : gameObject, _damage, _hitStopFrame);
+        DamageData damageData = new DamageData(
+            _owner != null ? _owner : gameObject,
+            _damage,
+            _hitStopFrame,
+            _staggerLevel);
         for (int i = 0; i < count; i++)
         {
             Collider hit = _overlapResults[i];

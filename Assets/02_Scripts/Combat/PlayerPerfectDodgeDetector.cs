@@ -7,6 +7,16 @@ public class PlayerPerfectDodgeDetector : MonoBehaviour
     [SerializeField] private PlayerCore _player;
     [SerializeField] private EnemyCore[] _enemies;
 
+    private HashSet<EnemyCore> _enemyHash;
+
+    private void Awake()
+    {
+        _enemyHash = new HashSet<EnemyCore>();
+        AddEnemy(_enemies);
+        EnemyCore[] sceneEnemies = FindObjectsByType<EnemyCore>();
+        AddEnemy(sceneEnemies);
+    }
+
     private void OnEnable()
     {
         if (_player != null)
@@ -23,7 +33,7 @@ public class PlayerPerfectDodgeDetector : MonoBehaviour
     {
         EnemyCore dodgeSource = null;
 
-        List<EnemyCore> sortedEnemies = GetEnemiesByDistance(_player.transform, _enemies);
+        List<EnemyCore> sortedEnemies = GetEnemiesByDistance(_player.transform, _enemyHash);
         foreach (var enemy in sortedEnemies)
         {
             if (enemy != null && enemy.isActiveAndEnabled && enemy.CurrentHP > 0f && enemy.IsPlayerInEnemyAttackRange())
@@ -34,8 +44,17 @@ public class PlayerPerfectDodgeDetector : MonoBehaviour
         return dodgeSource;
     }
 
-    private List<EnemyCore> GetEnemiesByDistance(Transform player, EnemyCore[] enemies)
+    private List<EnemyCore> GetEnemiesByDistance(Transform player, HashSet<EnemyCore> enemies)
     {
         return enemies.Where(enemy => enemy != null).OrderBy(enemy => (enemy.transform.position - player.position).sqrMagnitude).ToList();
+    }
+
+    private void AddEnemy(EnemyCore[] enemies)
+    {
+        foreach(var enemy in enemies)
+        {
+            if (enemy != null)
+                _enemyHash.Add(enemy);
+        }
     }
 }

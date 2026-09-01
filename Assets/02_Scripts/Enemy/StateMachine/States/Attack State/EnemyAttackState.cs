@@ -32,7 +32,7 @@ public abstract class EnemyAttackState : EnemyStateBase
             return;
 
         if (_isTransitionIdle)
-        { 
+        {
             EnemyStateBase nextState =
                 Core.TargetTransform != null
                     ? Core.StateMachine.EngageState
@@ -72,6 +72,7 @@ public abstract class EnemyAttackState : EnemyStateBase
 
         // 플래그 리셋
         Core.Animator.ResetTrigger(AnimationTrigger);
+        Core.ReleaseAttackPermission();
     }
 
     private void SetTransitionIdle(AnimationEvent animationEvent)
@@ -81,6 +82,9 @@ public abstract class EnemyAttackState : EnemyStateBase
 
     private void SetDamaged(DamageData data)
     {
+        if (!Core.ShouldEnterHitReaction(data))
+            return;
+
         _isDamaged = true;
 
         HitDirectionType type = HitDirectionCalculator.GetHitDirection(data, Core.transform.position, Core.Rotator.FacingDirection);

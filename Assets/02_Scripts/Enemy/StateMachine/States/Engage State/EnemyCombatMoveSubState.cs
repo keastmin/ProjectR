@@ -19,7 +19,7 @@ public abstract class EnemyCombatMoveSubState : EnemyStateBase
     public override void FixedTick()
     {
         Vector3 velocity = AnimDeltaPos / Time.fixedDeltaTime;
-        Core.Mover.Move(velocity);
+        Core.Mover.Move(Core.AdjustPositioningMovement(velocity));
         AnimDeltaPos = Vector3.zero;
     }
 

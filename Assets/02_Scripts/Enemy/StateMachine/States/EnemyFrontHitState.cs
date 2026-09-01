@@ -76,6 +76,9 @@ public class EnemyFrontHitState : EnemyStateBase
 
     private void SetDamaged(DamageData data)
     {
+        if (!Core.ShouldEnterHitReaction(data))
+            return;
+
         _isDamaged = true;
         HitDirectionType type = HitDirectionCalculator.GetHitDirection(data, Core.transform.position, Core.Rotator.FacingDirection);
         if (type == HitDirectionType.Front)
