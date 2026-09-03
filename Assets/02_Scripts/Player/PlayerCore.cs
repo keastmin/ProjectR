@@ -4,6 +4,7 @@ using UnityEngine.Events;
 
 public class PlayerCore : MonoBehaviour, IHitStopParticipant, IDamageable
 {
+    [SerializeField, Min(1f)] private float _maxHealth = 100f;
     [SerializeField] private Camera _mainCamera;
     [SerializeField] private Animator _animator;
     [SerializeField] private PlayerAnimatorController _animatorController;
@@ -33,6 +34,8 @@ public class PlayerCore : MonoBehaviour, IHitStopParticipant, IDamageable
     private bool _isStartingDodgeAttack;
     private float _baseAnimatorSpeed;
 
+    private float _currentHealth = 0f;
+
     // 프로퍼티
     public Camera MainCamera => _mainCamera;
     public Animator Animator => _animator;
@@ -61,13 +64,17 @@ public class PlayerCore : MonoBehaviour, IHitStopParticipant, IDamageable
     public event Action<EnemyCore> OnPerfectDodgeStarted;
     public event Action OnPerfectDodgeEnded;
     public event Action<EnemyCore> OnDodgeAttackStarted;
-    public Func<EnemyCore> OnPerfectDodgeCheck; // 완벽 회피라면 완벽회피를 하게 한 대상을 반환 
+    public Func<EnemyCore> OnPerfectDodgeCheck; // 완벽 회피라면 완벽회피를 하게 한 대상을 반환
+    public event Action<float, float> OnHealthChange; // 체력 변화가 있을 때 호출되는 이벤트, <최대 체력, 현재 체력>
 
     private void Awake()
     {
         _baseAnimatorSpeed = _animator.speed;
         // 애니메이터 초기화
         _animatorController.OnAnimationTick += OnAnimationTickLoop; // OnAnimatorMove 틱에 작동하는 함수
+
+        // 체력 초기화
+        _currentHealth = _maxHealth;
 
         TryGetComponent(out _directorContainer);
         _directorContainer.InitTimelineDirectorContainer();
@@ -184,6 +191,10 @@ public class PlayerCore : MonoBehaviour, IHitStopParticipant, IDamageable
         EndPerfectDodge(true);
         LastDamageData = damageData;
         OnDamaged?.Invoke(damageData);
+
+        // 체력 감소
+        _currentHealth = Mathf.Clamp(_currentHealth - damageData.DamageAmount, 0f, _maxHealth);
+        OnHealthChange?.Invoke(_maxHealth, _currentHealth);
 
         return true;
     }
