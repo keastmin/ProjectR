@@ -25,9 +25,10 @@ public abstract class PlayerBasicAttackState : PlayerStateBase
         Core.AnimationEvent.OnEnableNextBasicAttack += HandleNextComboEnableEvent;
         Core.AnimationEvent.OnDisableNextBasicAttack += HandleNextComboDisableEvent;
 
-        Vector3 targetDirection = Core.TargetDetector.NearestEnemyCollider == null
+        Collider target = Core.TargetDetector.AcquireBasicAttackTarget();
+        Vector3 targetDirection = target == null
             ? Core.DirCalculator.GetTargetDirection(Core.InputCollector.MoveValue, Core.MainCamera.transform)
-            : Core.TargetDetector.NearestEnemyDirection;
+            : (target.transform.position - Core.transform.position).normalized;
         Core.Rotator.RotateImmediately(targetDirection);
 
         base.Enter();

@@ -537206,33 +537206,12 @@ AnimationClip:
     floatParameter: 0
     intParameter: 0
     messageOptions: 0
-  - time: 0.25
-    functionName: OnAttackNoticeWindow
-    data: 
-    objectReferenceParameter: {fileID: 0}
-    floatParameter: 0
-    intParameter: 4
-    messageOptions: 0
-  - time: 0.33333334
-    functionName: OnAttackNoticeWindow
-    data: 
-    objectReferenceParameter: {fileID: 0}
-    floatParameter: 0
-    intParameter: 5
-    messageOptions: 0
   - time: 0.35
     functionName: OnAttack
     data: 
     objectReferenceParameter: {fileID: 11400000, guid: dd48506b54b4e5d419ad9456a44ba365, type: 2}
     floatParameter: 0
     intParameter: 0
-    messageOptions: 0
-  - time: 0.35
-    functionName: OnAttackNoticeWindow
-    data: 
-    objectReferenceParameter: {fileID: 0}
-    floatParameter: 0
-    intParameter: -1
     messageOptions: 0
   - time: 0.45
     functionName: OnSwordTrailEffectDeactive

@@ -8,10 +8,44 @@ public class EnemyAttackSO : ScriptableObject
     public int HitStopFrame;
     public LayerMask DamagedLayer;
     public EnemyAttackHitboxInfo[] HitboxInfo;
-    public AnimationClip AttackAnimationClip; // 공격을 하는 애니메이션 클립
-    public float RootMotionMultiply; // 실제 이동에 관여하는 루트 모션에 곱하는 값
-    public int SimulateStup; // 몇 번 시뮬레이션 할 것인지
-    public string AttackFunctionName; // 애니메이션 클립 안에서 공격 함수 이름
-    public float AttackAnimationTransitionTime; // 공격 대기 시간
-    public int AttackOfNumber; // 애니메이션 클립 안에서 몇 번째 히트인지 -> 처음: 0
+    [Min(0f), Tooltip("공격 예고 후 공격 애니메이션으로 전환하기까지의 시간입니다.")]
+    public float AttackAnimationTransitionTime;
+    [Min(0f), Tooltip("공격 시작 위치에서 허용되는 최대 모션 워핑 거리입니다.")]
+    public float AttackWarpDistance;
+    [Min(0f), Tooltip("공격 위치가 플레이어를 추적할 때 허용되는 초당 최대 회전 각도입니다.")]
+    public float AttackRotationAnglePerSecond;
+
+    /// <summary>
+    /// Maximum planar distance from the attacker origin at which this attack can
+    /// touch a target. AttackWarpDistance moves the attacker root; the hitbox's
+    /// forward offset and extent provide the remaining reach.
+    /// </summary>
+    public float GetMaximumAttackReach()
+    {
+        float forwardHitboxReach = 0f;
+
+        if (HitboxInfo != null)
+        {
+            foreach (EnemyAttackHitboxInfo hitbox in HitboxInfo)
+            {
+                Vector3 size = new(
+                    Mathf.Abs(hitbox.Size.x),
+                    Mathf.Abs(hitbox.Size.y),
+                    Mathf.Abs(hitbox.Size.z));
+
+                float forwardExtent = hitbox.HitboxType == EnemyAttackHitboxType.Sphere
+                    ? Mathf.Max(size.x, size.y, size.z) * 0.5f
+                    : size.z * 0.5f;
+
+                if (forwardExtent <= 0f && hitbox.HitboxType == EnemyAttackHitboxType.Sphere)
+                    forwardExtent = Mathf.Max(0f, hitbox.Radius.x);
+
+                forwardHitboxReach = Mathf.Max(
+                    forwardHitboxReach,
+                    hitbox.Offset.z + forwardExtent);
+            }
+        }
+
+        return Mathf.Max(0f, AttackWarpDistance) + Mathf.Max(0f, forwardHitboxReach);
+    }
 }

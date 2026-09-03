@@ -187,7 +187,7 @@ public class EnemyPositioningController : MonoBehaviour
         return state.Action;
     }
 
-    public bool CanBeginAttack(EnemyCore enemy)
+    public bool CanBeginAttack(EnemyCore enemy, float attackMaximumReach = 0f)
     {
         if (!TryGetActiveState(enemy, out _) || enemy.TargetTransform == null)
             return false;
@@ -197,7 +197,11 @@ public class EnemyPositioningController : MonoBehaviour
 
         Vector3 toTarget = Flatten(enemy.TargetTransform.position - enemy.transform.position);
         float distance = toTarget.magnitude;
-        if (distance < _minimumAttackDistance || distance > _maximumAttackDistance)
+        float maximumAttackDistance = attackMaximumReach > 0f
+            ? attackMaximumReach
+            : _maximumAttackDistance;
+
+        if (distance < _minimumAttackDistance || distance > maximumAttackDistance)
         {
             TryClaimLaneRequest(enemy);
             return false;

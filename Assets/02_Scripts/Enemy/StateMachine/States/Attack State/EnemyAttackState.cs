@@ -45,13 +45,8 @@ public abstract class EnemyAttackState : EnemyStateBase
 
     public override void FixedTick()
     {
-        Vector3 forward = Core.Rotator.FacingDirection;
-        forward.y = 0f;
-        forward.Normalize();
-
-        float forwardDelta = Vector3.Dot(AnimDeltaPos, forward);
-
-        Core.Mover.Move(forward * forwardDelta / Time.fixedDeltaTime);
+        AnimDeltaPos.y = 0f;
+        Core.Mover.Move(AnimDeltaPos / Time.fixedDeltaTime);
         AnimDeltaPos = Vector3.zero;
     }
 
@@ -72,6 +67,7 @@ public abstract class EnemyAttackState : EnemyStateBase
 
         // 플래그 리셋
         Core.Animator.ResetTrigger(AnimationTrigger);
+        Core.EndAttackTargeting();
         Core.ReleaseAttackPermission();
     }
 

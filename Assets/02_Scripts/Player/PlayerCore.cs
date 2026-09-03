@@ -138,6 +138,7 @@ public class PlayerCore : MonoBehaviour, IHitStopParticipant, IDamageable
     {
         EndPerfectDodge(true);
         DodgeAttackTarget = null;
+        _targetDetector?.ClearBasicAttackTarget();
         EndHitStop();
         CombatTimeController.ScaleChanged -= ApplyCombatSpeed;
         ApplyCombatSpeed(1f);

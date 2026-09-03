@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
 {
@@ -11,8 +10,11 @@ public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
     [SerializeField] private EnemyAnimatorCallback _animatorCallback;
     [SerializeField] private EnemyAttackSO[] _attackSOs;
 
-    [SerializeField] private Collider[] _closeAttackNoticeBoxies;
-    [SerializeField] private LayerMask _playerHurtboxLayer;
+    [Header("Attack Targeting Debug")]
+    [SerializeField] private bool _drawAttackTargetingGizmos = true;
+    [SerializeField] private Color _damageFieldColor = new(1f, 0.15f, 0.1f, 0.95f);
+    [SerializeField] private Color _perfectDodgeRangeColor = new(1f, 0.8f, 0.1f, 0.95f);
+    [SerializeField] private Color _attackWarpPathColor = new(0.1f, 0.85f, 1f, 0.95f);
 
     [Header("Hit Reaction Resistance")]
     [SerializeField, Tooltip("평상시에 이 레벨 이상의 플레이어 공격이 피격 상태를 발생시킵니다.")]
@@ -35,6 +37,7 @@ public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
     private EnemyAttackSimulator _attackSimulator;
     private EnemyAttackTimingController _attackTimingController;
     private EnemyPositioningController _positioningController;
+    private EnemyAttackTargetingController _attackTargeting;
     private bool _isHitStopped;
     private float _baseAnimatorSpeed;
     private float _fallbackAttackCooldownRemaining;
@@ -53,16 +56,19 @@ public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
     public EnemyHitboxPool HitboxPool => _hitboxPool;
     public EnemyAttackSimulator AttackSimulator => _attackSimulator;
     public EnemyPositioningController PositioningController => _positioningController;
+    public EnemyAttackTargetingController AttackTargeting => _attackTargeting;
     public DamageData LastDamageData => _lastDamageData;
     public bool IsHitStopped => _isHitStopped;
+    /// <summary>
+    /// True from the start of an attack notice until the attack completes or is interrupted.
+    /// UI such as off-screen enemy markers can use this without knowing the active state.
+    /// </summary>
+    public bool IsAttackWarningActive { get; private set; }
     public Transform TargetTransform => TargetDetector.TargetTransform;
 
     public Dictionary<EnemyAttackID, EnemyAttackSO> AttackDataDictionary;
-    public Collider[] CloseAttackNotiveBoxies => _closeAttackNoticeBoxies;
     public event Action<DamageData> OnDamaged;
-
-    private List<Collider> _attackRangeColliders = new();
-    private Collider[] _playerDetectCollider = new Collider[10];
+    public event Action OnAttackCooldownReady;
 
     private void Awake()
     {
@@ -78,6 +84,7 @@ public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
         TryGetComponent(out _targetDetector);
         TryGetComponent(out _hitboxPool);
         TryGetComponent(out _attackSimulator);
+        _attackTargeting = new EnemyAttackTargetingController(this);
 
         _currentHP = _maxHP;
         _fallbackAttackCooldownRemaining = UnityEngine.Random.Range(1.5f, 3.5f);
@@ -142,6 +149,7 @@ public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
 
     private void OnDisable()
     {
+        EndAttackTargeting();
         ReleaseAttackPermission();
         _positioningController?.Unregister(this);
         EndHitStop();
@@ -191,7 +199,7 @@ public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
         return true;
     }
 
-    public bool TryBeginAttack()
+    public bool TryBeginAttack(EnemyAttackSO attackSO = null)
     {
         if (_attackTimingController != null)
         {
@@ -203,7 +211,12 @@ public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
             return false;
         }
 
-        if (_positioningController != null && !_positioningController.CanBeginAttack(this))
+        float maximumAttackReach = attackSO != null
+            ? attackSO.GetMaximumAttackReach()
+            : 0f;
+
+        if (_positioningController != null &&
+            !_positioningController.CanBeginAttack(this, maximumAttackReach))
             return false;
 
         bool granted;
@@ -226,6 +239,7 @@ public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
 
     public void ReleaseAttackPermission()
     {
+        IsAttackWarningActive = false;
         _positioningController?.NotifyAttackEnded(this);
 
         if (_attackTimingController != null)
@@ -301,58 +315,51 @@ public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
     // 공격
     private void HandleAttack(EnemyAttackSO attackSO)
     {
+        CompleteAttackWarpForImpact();
         HitboxPool.SpacingHitboxes(attackSO);
     }
 
-    public void SetAttackNoticeCollider(Collider[] colliders)
+    private void CompleteAttackWarpForImpact()
     {
-        if (_attackRangeColliders == null)
-            _attackRangeColliders = new List<Collider>();
-        ClearAttackNoticeCollider();
-        foreach(var col in colliders)
-        {
-            if (col != null)
-                _attackRangeColliders.Add(col);
-        }
+        if (_attackTargeting == null || !_attackTargeting.IsActive)
+            return;
+
+        _attackTargeting.Lock();
+        _stateMachine.ClearAccumulatedMotion();
+        _rotator.RotateImmediately(_attackTargeting.TargetForward);
+        _mover.WarpTo(_attackTargeting.TargetPosition);
+
+        // The hitbox query runs in this same animation-event call. Synchronize the
+        // physics broadphase so it observes the completed impact pose immediately.
+        Physics.SyncTransforms();
     }
 
-    public void ClearAttackNoticeCollider()
+    public void BeginAttackTargeting(EnemyAttackSO attackSO)
     {
-        if (_attackRangeColliders == null)
-            _attackRangeColliders = new List<Collider>();
-        _attackRangeColliders.Clear();
+        if (attackSO != null)
+            IsAttackWarningActive = true;
+
+        _attackTargeting?.Begin(attackSO);
+    }
+
+    public void UpdateAttackTargeting()
+    {
+        _attackTargeting?.UpdateTarget(CombatTimeController.DeltaTime);
+    }
+
+    public void LockAttackTargeting()
+    {
+        _attackTargeting?.Lock();
+    }
+
+    public void EndAttackTargeting()
+    {
+        _attackTargeting?.End();
     }
 
     public bool IsPlayerInEnemyAttackRange()
     {
-        foreach(var col in _attackRangeColliders)
-        {
-            if(col != null)
-            {
-                if (col is BoxCollider box)
-                {
-                    Vector3 halfExtents = Vector3.Scale(box.size, Abs(box.transform.lossyScale)) * 0.5f;
-
-                    int detectCount = Physics.OverlapBoxNonAlloc(
-                                              box.transform.TransformPoint(box.center),
-                                              halfExtents,
-                                              _playerDetectCollider,
-                                              box.transform.rotation,
-                                              _playerHurtboxLayer,
-                                              QueryTriggerInteraction.Collide);
-
-                    if (detectCount > 0)
-                        return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    private Vector3 Abs(Vector3 value)
-    {
-        return new Vector3(Mathf.Abs(value.x), Mathf.Abs(value.y), Mathf.Abs(value.z));
+        return _attackTargeting != null && _attackTargeting.IsPlayerInNoticeRange();
     }
 
     private void TickCombatTimers()
@@ -394,5 +401,16 @@ public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
         _hitReactionResistanceDurationRange.y = Mathf.Max(
             _hitReactionResistanceDurationRange.x,
             _hitReactionResistanceDurationRange.y);
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (!_drawAttackTargetingGizmos || !Application.isPlaying)
+            return;
+
+        _attackTargeting?.DrawGizmos(
+            _damageFieldColor,
+            _perfectDodgeRangeColor,
+            _attackWarpPathColor);
     }
 }

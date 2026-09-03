@@ -16,10 +16,22 @@ public class EnemySphereHitbox : EnemyHitbox
         if (_collider == null)
             return;
 
-        // Radius is stored as a Vector3 in the existing attack data. A sphere has
-        // one radius, so its X value is the authored radius.
-        _collider.center = hitboxInfo.Center;
-        _collider.radius = Mathf.Max(0f, hitboxInfo.Radius.x);
+        transform.localPosition = hitboxInfo.Offset;
+        transform.localRotation = Quaternion.identity;
+
+        Vector3 size = Abs(hitboxInfo.Size);
+        if (size.sqrMagnitude > 0.000001f)
+        {
+            transform.localScale = size;
+            _collider.radius = 0.5f;
+        }
+        else
+        {
+            transform.localScale = Vector3.one;
+            _collider.radius = Mathf.Max(0f, hitboxInfo.Radius.x);
+        }
+
+        _collider.center = Vector3.zero;
     }
 
     public override Collider[] DetectTargets(LayerMask targetLayers)

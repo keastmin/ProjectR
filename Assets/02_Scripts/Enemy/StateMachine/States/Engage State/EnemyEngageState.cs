@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class EnemyEngageState : EnemyCompositeState
 {
+    private const EnemyAttackID PrimaryAttackID = EnemyAttackID.CloseAttack1Hit;
+
     // 상태 정의
     private readonly EnemyCombatHoldState _holdState;
     private readonly EnemyCombatMoveLeftState _moveLeftState;
@@ -12,9 +14,12 @@ public class EnemyEngageState : EnemyCompositeState
 
     private float _decisionTime;
     private bool _isDamaged = false;
+    private readonly EnemyAttackSO _primaryAttack;
 
     public EnemyEngageState(EnemyCore core) : base(core)
     {
+        core.AttackDataDictionary.TryGetValue(PrimaryAttackID, out _primaryAttack);
+
         // 상태 생성
         _holdState = new EnemyCombatHoldState(core, this);
         _moveLeftState = new EnemyCombatMoveLeftState(core, this);
@@ -74,7 +79,7 @@ public class EnemyEngageState : EnemyCompositeState
 
     private void SelectNextAction()
     {
-        if (Core.TryBeginAttack())
+        if (Core.TryBeginAttack(_primaryAttack))
         {
             Core.StateMachine.Transition(Core.StateMachine.CloseAttackNoticeState);
             return;

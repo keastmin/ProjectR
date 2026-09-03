@@ -93,6 +93,8 @@ public class PlayerStateMachine
     public void Transition(PlayerStateBase nextState)
     {
         _currentState?.Exit();
+        if (_currentState is PlayerBasicAttackState && nextState is not PlayerBasicAttackState)
+            _core.TargetDetector.ClearBasicAttackTarget();
         if (_currentState is PlayerDodgeAttackState && nextState is not PlayerDodgeAttackState)
             _core.ClearDodgeAttackTarget();
         _currentState = nextState;

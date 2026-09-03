@@ -31,8 +31,4 @@ public class EnemyAnimationEventSender : MonoBehaviour
         _animEvent.AttackNoticeVFX();
     }
 
-    public void OnAttackNoticeWindow(int index)
-    {
-        _animEvent.AttackWindowActive(index);
-    }
 }

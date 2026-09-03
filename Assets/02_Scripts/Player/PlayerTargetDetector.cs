@@ -9,6 +9,7 @@ public class PlayerTargetDetector : MonoBehaviour
 
     private Collider[] _targetEnemyColliders;
     private Collider _nearestEnemyCollider;
+    private Collider _basicAttackTargetCollider;
 
     public Collider NearestEnemyCollider
     {
@@ -33,11 +34,15 @@ public class PlayerTargetDetector : MonoBehaviour
             return NearestEnemyCollider != null ? (NearestEnemyPosition - transform.position).normalized : Vector3.zero;
         }
     }
+    public Collider BasicAttackTargetCollider => IsTargetAvailable(_basicAttackTargetCollider)
+        ? _basicAttackTargetCollider
+        : null;
 
     private void Awake()
     {
         _targetEnemyColliders = new Collider[100];
         _nearestEnemyCollider = null;
+        _basicAttackTargetCollider = null;
     }
 
     private void Update()
@@ -62,6 +67,9 @@ public class PlayerTargetDetector : MonoBehaviour
         Collider nearestTarget = null;
         for(int i = 0; i < detectedCount; i++)
         {
+            if (!IsTargetAvailable(_targetEnemyColliders[i]))
+                continue;
+
             Vector3 dir = _targetEnemyColliders[i].transform.position - transform.position;
             float sqr = dir.sqrMagnitude;
             if(minDist > sqr)
@@ -72,6 +80,29 @@ public class PlayerTargetDetector : MonoBehaviour
         }
 
         return nearestTarget;
+    }
+
+    public Collider AcquireBasicAttackTarget()
+    {
+        // 콤보가 이어지는 동안에는 더 가까운 적이 생겨도 기존 대상을 유지합니다.
+        if (!IsTargetAvailable(_basicAttackTargetCollider))
+            _basicAttackTargetCollider = DetectTargets();
+
+        return BasicAttackTargetCollider;
+    }
+
+    public void ClearBasicAttackTarget()
+    {
+        _basicAttackTargetCollider = null;
+    }
+
+    private static bool IsTargetAvailable(Collider target)
+    {
+        if (target == null || !target.enabled || !target.gameObject.activeInHierarchy)
+            return false;
+
+        EnemyCore enemy = target.GetComponentInParent<EnemyCore>();
+        return enemy == null || (enemy.isActiveAndEnabled && enemy.CurrentHP > 0f);
     }
 
     private void OnDrawGizmosSelected()

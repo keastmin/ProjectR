@@ -3,38 +3,33 @@ using UnityEngine;
 public class EnemyCloseAttackNoticeState : EnemyAttackNoticeState
 {
     private const EnemyAttackID _attackID1 = EnemyAttackID.CloseAttack1Hit;
-    private const EnemyAttackID _attackID2 = EnemyAttackID.CloseAttack2Hit;
     private EnemyAttackSO _attackSO1;
-    private EnemyAttackSO _attackSO2;
 
     private float _currentTime = 0f;
 
     public EnemyCloseAttackNoticeState(EnemyCore core) : base(core)
     {
         _attackSO1 = core.AttackDataDictionary[_attackID1];
-        _attackSO2 = core.AttackDataDictionary[_attackID2];
     }
 
     public override void Enter()
     {
+        Core.BeginAttackTargeting(_attackSO1);
         base.Enter();
-        Collider[] attackColliders = { Core.CloseAttackNotiveBoxies[0] };
-        Core.SetAttackNoticeCollider(attackColliders);
         _currentTime = 0f;
     }
 
     public override void UpdateTick()
     {
-        Vector3 direction = Core.TargetTransform != null ?
-            Core.TargetTransform.position - Core.transform.position :
-            Core.Rotator.FacingDirection;
-
-        direction.y = 0f;
-        Core.Rotator.RotateToward(direction);
+        Core.UpdateAttackTargeting();
+        Core.Rotator.RotateToward(
+            Core.AttackTargeting.TargetForward,
+            _attackSO1.AttackRotationAnglePerSecond);
 
         _currentTime += CombatTimeController.DeltaTime;
         if(_currentTime >= _attackSO1.AttackAnimationTransitionTime)
         {
+            Core.LockAttackTargeting();
             Core.StateMachine.Transition(Core.StateMachine.CloseAttackState);
             return;
         }
@@ -44,7 +39,6 @@ public class EnemyCloseAttackNoticeState : EnemyAttackNoticeState
 
     public override void Exit()
     {
-        Core.ClearAttackNoticeCollider();
         base.Exit();
     }
 }

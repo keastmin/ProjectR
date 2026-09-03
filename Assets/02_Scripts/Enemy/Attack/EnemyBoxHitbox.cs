@@ -16,10 +16,11 @@ public class EnemyBoxHitbox : EnemyHitbox
         if (_collider == null)
             return;
 
-        // HitboxInfo is expressed in the Hitboxies local space. Keep this pooled
-        // object's transform untouched so it continues to follow its current parent.
-        _collider.center = hitboxInfo.Center;
-        _collider.size = hitboxInfo.Size;
+        transform.localPosition = hitboxInfo.Offset;
+        transform.localRotation = Quaternion.identity;
+        transform.localScale = Abs(hitboxInfo.Size);
+        _collider.center = Vector3.zero;
+        _collider.size = Vector3.one;
     }
 
     public override Collider[] DetectTargets(LayerMask targetLayers)

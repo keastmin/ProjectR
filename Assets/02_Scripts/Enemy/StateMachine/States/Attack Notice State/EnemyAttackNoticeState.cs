@@ -31,6 +31,7 @@ public abstract class EnemyAttackNoticeState : EnemyStateBase
         if (!Core.ShouldEnterHitReaction(data))
             return;
 
+        Core.EndAttackTargeting();
         Core.ReleaseAttackPermission();
 
         HitDirectionType type = HitDirectionCalculator.GetHitDirection(

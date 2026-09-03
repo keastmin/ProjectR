@@ -14,6 +14,7 @@ public class EnemyAttackTimingController : MonoBehaviour
     [SerializeField] private Vector2 _urgentAttackDelayRange = new(0f, 0.25f);
 
     private readonly Dictionary<EnemyCore, float> _nextAttackTimes = new();
+    private readonly HashSet<EnemyCore> _repeatCooldownLockedEnemies = new();
 
     private EnemyCore _activeAttacker;
     private float _combatTime;
@@ -46,6 +47,7 @@ public class EnemyAttackTimingController : MonoBehaviour
         }
 
         _nextAttackTimes.Clear();
+        _repeatCooldownLockedEnemies.Clear();
         _activeAttacker = null;
     }
 
@@ -73,6 +75,7 @@ public class EnemyAttackTimingController : MonoBehaviour
             return false;
 
         _activeAttacker = enemy;
+        _repeatCooldownLockedEnemies.Remove(enemy);
         return true;
     }
 
@@ -97,6 +100,7 @@ public class EnemyAttackTimingController : MonoBehaviour
         _activeAttacker = null;
         _nextGlobalAttackTime = _combatTime + RandomInRange(_betweenAttackGapRange);
         _nextAttackTimes[enemy] = _combatTime + RandomInRange(_repeatAttackDelayRange);
+        _repeatCooldownLockedEnemies.Add(enemy);
     }
 
     public void PrioritizeAttack(EnemyCore enemy)
@@ -106,6 +110,16 @@ public class EnemyAttackTimingController : MonoBehaviour
 
         if (!_nextAttackTimes.ContainsKey(enemy))
             Register(enemy);
+
+        // A completed or interrupted attack must always pay its configured repeat
+        // cooldown. Multi-hit counters can call PrioritizeAttack several times
+        // while the enemy is in hit reaction; allowing that to shorten this timer
+        // makes Repeat Attack Delay Range appear to be ignored.
+        if (_repeatCooldownLockedEnemies.Contains(enemy) &&
+            _combatTime < _nextAttackTimes[enemy])
+        {
+            return;
+        }
 
         float urgentAttackTime = _combatTime + RandomInRange(_urgentAttackDelayRange);
         _nextAttackTimes[enemy] = Mathf.Min(_nextAttackTimes[enemy], urgentAttackTime);

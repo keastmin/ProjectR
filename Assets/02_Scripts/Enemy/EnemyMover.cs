@@ -43,6 +43,17 @@ public class EnemyMover : MonoBehaviour
         _inputVelocity = velocity;
     }
 
+    public void WarpTo(Vector3 worldPosition)
+    {
+        if (_isHitStopped)
+            return;
+
+        _inputVelocity = Vector3.zero;
+        _rigidbody.linearVelocity = Vector3.zero;
+        _rigidbody.position = worldPosition;
+        transform.position = worldPosition;
+    }
+
     public void SetHitStopped(bool stopped)
     {
         if (_isHitStopped == stopped)
