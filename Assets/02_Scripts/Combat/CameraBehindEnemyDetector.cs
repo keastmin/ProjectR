@@ -156,9 +156,14 @@ public class CameraBehindEnemyDetector : MonoBehaviour
             _detectCamera.transform.position -
             marker.position;
 
+        //marker.rotation =
+        //    Quaternion.LookRotation(
+        //        toCamera.normalized,
+        //        direction
+        //    );
         marker.rotation =
             Quaternion.LookRotation(
-                toCamera.normalized,
+                Vector3.down,
                 direction
             );
     }

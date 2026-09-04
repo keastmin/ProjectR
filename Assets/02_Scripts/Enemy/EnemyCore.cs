@@ -68,7 +68,7 @@ public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
 
     public Dictionary<EnemyAttackID, EnemyAttackSO> AttackDataDictionary;
     public event Action<DamageData> OnDamaged;
-    public event Action OnAttackCooldownReady;
+    public event Action<float, float> OnHealthChange; // 체력이 변경되면 호출, <최대 체력, 현재 체력>
 
     private void Awake()
     {
@@ -165,6 +165,7 @@ public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
         _currentHP = Mathf.Max(_currentHP - damageData.DamageAmount, 0f);
         _lastDamageData = damageData;
         OnDamaged?.Invoke(damageData);
+        OnHealthChange?.Invoke(_maxHP, _currentHP);
         return true;
     }
 
