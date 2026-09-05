@@ -1,4 +1,6 @@
+using System.Xml;
 using UnityEngine;
+using UnityEngine.SocialPlatforms.Impl;
 
 public abstract class EnemyStateBase
 {
@@ -17,7 +19,11 @@ public abstract class EnemyStateBase
 
     public virtual void UpdateTick()
     {
-
+        if (Core.IsDead)
+        {
+            Core.StateMachine.Transition(Core.StateMachine.DeadState);
+            return;
+        }
     }
 
     public virtual void FixedTick()

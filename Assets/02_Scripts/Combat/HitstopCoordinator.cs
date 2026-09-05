@@ -10,6 +10,8 @@ public sealed class HitstopCoordinator : MonoBehaviour
 
     private readonly Dictionary<IHitStopParticipant, double> _releaseTimes = new();
     private readonly List<IHitStopParticipant> _releaseBuffer = new();
+    private readonly Dictionary<IHitStopParticipant, double> _pendingDurations = new();
+    private readonly List<KeyValuePair<IHitStopParticipant, double>> _startBuffer = new();
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetStatics()
@@ -32,17 +34,16 @@ public sealed class HitstopCoordinator : MonoBehaviour
             return;
 
         HitstopCoordinator coordinator = EnsureInstance();
-        double now = Time.realtimeSinceStartupAsDouble;
         double frameDuration = 1d / CombatFrameRate;
 
-        coordinator.Hold(attacker, now + attackerFrameCount * frameDuration);
+        coordinator.QueueHold(attacker, attackerFrameCount * frameDuration);
 
-        double victimReleaseTime = now + (attackerFrameCount + 1) * frameDuration;
+        double victimDuration = ((double)attackerFrameCount + 1d) * frameDuration;
         for (int i = 0; i < victims.Count; i++)
         {
             IHitStopParticipant victim = victims[i];
             if (victim != null)
-                coordinator.Hold(victim, victimReleaseTime);
+                coordinator.QueueHold(victim, victimDuration);
         }
     }
 
@@ -55,11 +56,10 @@ public sealed class HitstopCoordinator : MonoBehaviour
             return;
 
         HitstopCoordinator coordinator = EnsureInstance();
-        double releaseTime = Time.realtimeSinceStartupAsDouble
-            + ((double)baseFrameCount + 1d) / CombatFrameRate;
+        double duration = ((double)baseFrameCount + 1d) / CombatFrameRate;
 
         for (int i = 0; i < victims.Count; i++)
-            coordinator.Hold(victims[i], releaseTime);
+            coordinator.QueueHold(victims[i], duration);
     }
 
     private static HitstopCoordinator EnsureInstance()
@@ -94,7 +94,7 @@ public sealed class HitstopCoordinator : MonoBehaviour
         if (_releaseTimes.Count == 0)
             return;
 
-        double now = Time.realtimeSinceStartupAsDouble;
+        double now = Time.unscaledTimeAsDouble;
         _releaseBuffer.Clear();
 
         foreach (KeyValuePair<IHitStopParticipant, double> pair in _releaseTimes)
@@ -126,7 +126,31 @@ public sealed class HitstopCoordinator : MonoBehaviour
 
         _releaseTimes.Clear();
         _releaseBuffer.Clear();
+        _pendingDurations.Clear();
+        _startBuffer.Clear();
         _instance = null;
+    }
+
+    private void QueueHold(IHitStopParticipant participant, double duration)
+    {
+        if (IsDestroyed(participant))
+            return;
+        if (!_pendingDurations.TryGetValue(participant, out double pending) || duration > pending)
+            _pendingDurations[participant] = duration;
+    }
+
+    private void LateUpdate()
+    {
+        // Timeline notifications run inside animation evaluation. Freezing an
+        // Animator there discards motion from the very sample that caused the hit.
+        // Finish that sample (including OnAnimatorMove) before freezing everyone.
+        double now = Time.unscaledTimeAsDouble;
+        _startBuffer.Clear();
+        _startBuffer.AddRange(_pendingDurations);
+        _pendingDurations.Clear();
+        foreach (var pair in _startBuffer)
+            Hold(pair.Key, now + pair.Value);
+        _startBuffer.Clear();
     }
 
     private void Hold(IHitStopParticipant participant, double releaseTime)

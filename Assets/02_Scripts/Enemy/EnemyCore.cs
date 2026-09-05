@@ -6,6 +6,8 @@ public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
 {
     [SerializeField, Min(0f)] private float _maxHP = 100f;
     [SerializeField] private float _currentHP;
+    [SerializeField] private ParticleSystem _deadVFX;
+    [SerializeField] private CapsuleCollider _physicsCollider;
 
     [SerializeField] private EnemyAnimatorCallback _animatorCallback;
     [SerializeField] private EnemyAttackSO[] _attackSOs;
@@ -65,6 +67,8 @@ public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
     /// </summary>
     public bool IsAttackWarningActive { get; private set; }
     public Transform TargetTransform => TargetDetector.TargetTransform;
+    public bool IsDead => (_currentHP <= 0f);
+    public event Action OnDead;
 
     public Dictionary<EnemyAttackID, EnemyAttackSO> AttackDataDictionary;
     public event Action<DamageData> OnDamaged;
@@ -166,6 +170,7 @@ public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
         _lastDamageData = damageData;
         OnDamaged?.Invoke(damageData);
         OnHealthChange?.Invoke(_maxHP, _currentHP);
+
         return true;
     }
 
@@ -297,7 +302,8 @@ public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
             return;
 
         _isHitStopped = true;
-        _stateMachine.ClearAccumulatedMotion();
+        // The hit frame has already been evaluated. Keep its pending root motion
+        // so the hit reaction/attack resumes with the same remaining displacement.
         _mover.SetHitStopped(true);
 
         ApplyCombatSpeed(CombatTimeController.Scale);
@@ -391,6 +397,28 @@ public class EnemyCore : MonoBehaviour, IDamageable, IHitStopParticipant
         int min = Mathf.Max(1, _minConsecutiveHitReactions);
         int max = Mathf.Max(min, _maxConsecutiveHitReactions);
         _nextHitReactionThreshold = UnityEngine.Random.Range(min, max + 1);
+    }
+
+    public void DeadStart()
+    {
+        EnemyDeadEventInvoke();
+        ColliderDisable();
+        DeadVFXPlay();
+    }
+
+    public void EnemyDeadEventInvoke()
+    {
+        OnDead?.Invoke();
+    }
+
+    public void ColliderDisable()
+    {
+        _physicsCollider.isTrigger = true;
+    }
+
+    public void DeadVFXPlay()
+    {
+        _deadVFX.Play();
     }
 
     private void OnValidate()

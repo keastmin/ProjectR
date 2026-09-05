@@ -183,7 +183,7 @@ public class PlayerCore : MonoBehaviour, IHitStopParticipant, IDamageable
             return;
 
         _isHitStopped = true;
-        _stateMachine.ClearAccumulatedMotion();
+        _stateMachine.OnHitStopStarted();
         _mover.SetHitStopped(true);
 
         ApplyCombatSpeed(CombatTimeController.Scale);

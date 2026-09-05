@@ -21,6 +21,8 @@ public class EnemyCloseAttackNoticeState : EnemyAttackNoticeState
 
     public override void UpdateTick()
     {
+        base.UpdateTick();
+
         Core.UpdateAttackTargeting();
         Core.Rotator.RotateToward(
             Core.AttackTargeting.TargetForward,

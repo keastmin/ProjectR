@@ -160,10 +160,13 @@ public class PlayerAttackInstanceContainer : MonoBehaviour
                 _hitStopVictims.Add(participant);
         }
 
-        HitstopCoordinator.Request(
-            _ownerHitStopParticipant,
-            _hitStopVictims,
-            damageField.HitStopFrame);
+        if (damageField.HitStopMode == AttackHitStopMode.VictimsOnly)
+            HitstopCoordinator.RequestVictimsOnly(_hitStopVictims, damageField.HitStopFrame);
+        else
+            HitstopCoordinator.Request(
+                _ownerHitStopParticipant,
+                _hitStopVictims,
+                damageField.HitStopFrame);
     }
 
     // 데미지 입은 대상 해쉬 정리

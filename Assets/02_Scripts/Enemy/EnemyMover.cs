@@ -1,6 +1,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
+[DefaultExecutionOrder(100)]
 public class EnemyMover : MonoBehaviour
 {
     private const float GroundProbeStartHeight = 1f;
@@ -17,6 +18,7 @@ public class EnemyMover : MonoBehaviour
     private Vector3 _inputVelocity = Vector3.zero;
     private bool _isHitStopped;
     private RigidbodyConstraints _constraintsBeforeHitStop;
+    private RigidbodyInterpolation _interpolationBeforeHitStop;
 
     private void Awake()
     {
@@ -69,6 +71,9 @@ public class EnemyMover : MonoBehaviour
         if (_isHitStopped == stopped)
             return;
 
+        // Freeze the physics pose, not the interpolated render pose.
+        Vector3 position = _rigidbody.position;
+        Quaternion rotation = _rigidbody.rotation;
         _isHitStopped = stopped;
         _inputVelocity = Vector3.zero;
         _rigidbody.linearVelocity = Vector3.zero;
@@ -76,12 +81,18 @@ public class EnemyMover : MonoBehaviour
         if (stopped)
         {
             _constraintsBeforeHitStop = _rigidbody.constraints;
+            _interpolationBeforeHitStop = _rigidbody.interpolation;
+            _rigidbody.interpolation = RigidbodyInterpolation.None;
             _rigidbody.constraints = RigidbodyConstraints.FreezeAll;
         }
         else
         {
             _rigidbody.constraints = _constraintsBeforeHitStop;
+            _rigidbody.interpolation = _interpolationBeforeHitStop;
         }
+        _rigidbody.position = position;
+        _rigidbody.rotation = rotation;
+        transform.SetPositionAndRotation(position, rotation);
     }
 
     private Vector3 ApplyGroundHover(Vector3 velocity)

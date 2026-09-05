@@ -3,6 +3,7 @@ using UnityEngine.VFX;
 
 // 전투 VFX의 각 재생 컴포넌트에 등록합니다. Canvas/UI에는 자동 등록하지 않습니다.
 [DisallowMultipleComponent]
+[DefaultExecutionOrder(-8000)]
 public sealed class CombatVfxTime : MonoBehaviour
 {
     private ParticleSystem _particle;
@@ -12,18 +13,24 @@ public sealed class CombatVfxTime : MonoBehaviour
     private float _vfxBaseSpeed;
     private bool _timelineControlsParticle;
     private bool _initialized;
+    private IHitStopParticipant _owner;
+    private bool _freezeWithHitStop = true;
+    private bool _wasHitStopped;
 
-    public static void RegisterHierarchy(GameObject root, bool timelineControlsParticle = false)
+    public static void RegisterHierarchy(GameObject root, bool timelineControlsParticle = false,
+        IHitStopParticipant owner = null, bool freezeWithHitStop = true)
     {
+        owner ??= root.GetComponentInParent<IHitStopParticipant>();
         foreach (ParticleSystem particle in root.GetComponentsInChildren<ParticleSystem>(true))
-            Register(particle.gameObject, timelineControlsParticle);
+            Register(particle.gameObject, timelineControlsParticle, owner, freezeWithHitStop);
         foreach (VisualEffect effect in root.GetComponentsInChildren<VisualEffect>(true))
-            Register(effect.gameObject, timelineControlsParticle);
+            Register(effect.gameObject, timelineControlsParticle, owner, freezeWithHitStop);
         foreach (Tiny.Trail trail in root.GetComponentsInChildren<Tiny.Trail>(true))
-            Register(trail.gameObject, timelineControlsParticle);
+            Register(trail.gameObject, timelineControlsParticle, owner, freezeWithHitStop);
     }
 
-    private static void Register(GameObject target, bool timelineControlsParticle)
+    private static void Register(GameObject target, bool timelineControlsParticle,
+        IHitStopParticipant owner, bool freezeWithHitStop)
     {
         if (target.GetComponentInParent<Canvas>(true) != null)
             return;
@@ -31,6 +38,8 @@ public sealed class CombatVfxTime : MonoBehaviour
             clock = target.AddComponent<CombatVfxTime>();
         clock.Initialize();
         clock._timelineControlsParticle = timelineControlsParticle;
+        clock._owner = owner;
+        clock._freezeWithHitStop = freezeWithHitStop;
         clock.ApplyScale(CombatTimeController.Scale);
     }
 
@@ -63,8 +72,20 @@ public sealed class CombatVfxTime : MonoBehaviour
         ApplyScale(1f);
     }
 
+    private bool IsOwnerStopped => isActiveAndEnabled && _freezeWithHitStop &&
+        _owner != null && !(_owner is Object obj && obj == null) && _owner.IsHitStopped;
+
+    private void LateUpdate()
+    {
+        // Runs after the coordinator freezes the participants for this frame.
+        if (_wasHitStopped != IsOwnerStopped)
+            ApplyScale(CombatTimeController.Scale);
+    }
+
     public void ApplyScale(float scale)
     {
+        _wasHitStopped = IsOwnerStopped;
+        if (_wasHitStopped) scale = 0f;
         if (_particle != null)
         {
             var main = _particle.main;

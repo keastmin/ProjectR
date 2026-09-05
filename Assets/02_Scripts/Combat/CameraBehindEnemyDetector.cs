@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 #if UNITY_EDITOR
@@ -16,6 +18,7 @@ public class CameraBehindEnemyDetector : MonoBehaviour
 
     private GameObject[] _normalMarkers;
     private GameObject[] _warningMarkers;
+    private readonly Dictionary<EnemyCore, Action> _enemyDeathHandlers = new();
 
     private bool _isDebugPlayerExist = false;
 
@@ -27,6 +30,7 @@ public class CameraBehindEnemyDetector : MonoBehaviour
     private void Awake()
     {
         CreateMarkers();
+        SubscribeToEnemyDeaths();
     }
 
     private void Update()
@@ -43,6 +47,69 @@ public class CameraBehindEnemyDetector : MonoBehaviour
         {
             _normalMarkers[i] = CreateMarker(_normalMarkerPrefab);
             _warningMarkers[i] = CreateMarker(_warningMarkerPrefab);
+        }
+    }
+
+    private void SubscribeToEnemyDeaths()
+    {
+        foreach (EnemyCore enemy in _enemies)
+        {
+            if (enemy == null || _enemyDeathHandlers.ContainsKey(enemy))
+                continue;
+
+            Action deathHandler = () => RemoveMarkersFor(enemy);
+            _enemyDeathHandlers.Add(enemy, deathHandler);
+            enemy.OnDead += deathHandler;
+        }
+    }
+
+    private void RemoveMarkersFor(EnemyCore enemy)
+    {
+        if (_enemyDeathHandlers.TryGetValue(enemy, out Action deathHandler))
+        {
+            enemy.OnDead -= deathHandler;
+            _enemyDeathHandlers.Remove(enemy);
+        }
+
+        for (int i = 0; i < _enemies.Length; i++)
+        {
+            if (_enemies[i] != enemy)
+                continue;
+
+            DestroyMarkerAt(i, _normalMarkers);
+            DestroyMarkerAt(i, _warningMarkers);
+        }
+    }
+
+    private static void DestroyMarkerAt(int index, GameObject[] markers)
+    {
+        GameObject marker = markers[index];
+        if (marker == null)
+            return;
+
+        marker.SetActive(false);
+        Destroy(marker);
+        markers[index] = null;
+    }
+
+    private void OnDestroy()
+    {
+        foreach (KeyValuePair<EnemyCore, Action> pair in _enemyDeathHandlers)
+        {
+            if (pair.Key != null)
+                pair.Key.OnDead -= pair.Value;
+        }
+
+        if (_normalMarkers != null)
+        {
+            for (int i = 0; i < _normalMarkers.Length; i++)
+                DestroyMarkerAt(i, _normalMarkers);
+        }
+
+        if (_warningMarkers != null)
+        {
+            for (int i = 0; i < _warningMarkers.Length; i++)
+                DestroyMarkerAt(i, _warningMarkers);
         }
     }
 

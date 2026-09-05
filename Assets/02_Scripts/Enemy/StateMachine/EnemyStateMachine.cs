@@ -8,17 +8,22 @@ public class EnemyStateMachine
     public EnemyFrontHitState FrontHitState;
     public EnemyBackHitState BackHitState;
     public EnemyCloseAttackNoticeState CloseAttackNoticeState;
+    public EnemyDeadState DeadState;
 
     private EnemyStateBase _currentState;
 
+    private EnemyCore _core;
+
     public EnemyStateMachine(EnemyCore enemy)
     {
+        _core = enemy;
         IdleState = new EnemyIdleState(enemy);
         EngageState = new EnemyEngageState(enemy);
         CloseAttackState = new EnemyCloseAttackState(enemy);
         FrontHitState = new EnemyFrontHitState(enemy);
         BackHitState = new EnemyBackHitState(enemy);
         CloseAttackNoticeState = new EnemyCloseAttackNoticeState(enemy);
+        DeadState = new EnemyDeadState(enemy);
     }
 
     public void InitEnemyStateMachine(EnemyStateBase initState)
@@ -55,6 +60,8 @@ public class EnemyStateMachine
     public void Transition(EnemyStateBase nextState)
     {
         _currentState?.Exit();
+        // A pause preserves pending motion; cancelling a state does not.
+        _currentState?.ClearAccumulatedMotion();
         _currentState = nextState;
         _currentState?.Enter();
     }

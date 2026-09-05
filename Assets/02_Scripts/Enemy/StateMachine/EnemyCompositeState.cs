@@ -18,6 +18,8 @@ public class EnemyCompositeState : EnemyStateBase
 
     public override void UpdateTick()
     {
+        base.UpdateTick();
+
         CurrentSubState?.UpdateTick();
     }
 

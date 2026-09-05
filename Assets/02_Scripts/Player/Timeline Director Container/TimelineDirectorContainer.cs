@@ -78,7 +78,8 @@ public class TimelineDirectorContainer : MonoBehaviour
             controlAsset.updateParticle = timelineControlsParticles;
             GameObject source = controlAsset.sourceGameObject.Resolve(director);
             if (source != null)
-                CombatVfxTime.RegisterHierarchy(source, timelineControlsParticles);
+                CombatVfxTime.RegisterHierarchy(source, timelineControlsParticles,
+                    GetComponentInParent<IHitStopParticipant>(), timelineControlsParticles);
         }
 
         foreach (TrackAsset childTrack in track.GetChildTracks())

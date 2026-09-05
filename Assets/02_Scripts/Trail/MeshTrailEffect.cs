@@ -1,7 +1,6 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using static UnityEngine.Splines.SplineInstantiate;
 
 public class MeshTrailEffect : MonoBehaviour
 {
@@ -26,6 +25,12 @@ public class MeshTrailEffect : MonoBehaviour
     [SerializeField] private float _shaderVarRefreshRate = 0.05f;
 
     private bool _isTrailActive = false;
+    private IHitStopParticipant _owner;
+    private readonly List<GameObject> _ghosts = new();
+
+    private float EffectDeltaTime => _owner != null && _owner.IsHitStopped ? 0f : CombatTimeController.DeltaTime;
+
+    private void Awake() => _owner = GetComponentInParent<IHitStopParticipant>();
 
     public void ActiveDodgeEffect()
     {
@@ -68,9 +73,10 @@ public class MeshTrailEffect : MonoBehaviour
 
                 StartCoroutine(AnimateMaterialFloat(mr.material, 0, _shaderVarRate, _shaderVarRefreshRate));
 
-                Destroy(gObj, destroyDelay);
+                _ghosts.Add(gObj);
+                StartCoroutine(DestroyGhostAfter(gObj, destroyDelay));
             } 
-            yield return new WaitForSeconds(refreshRate);
+            yield return WaitForEffectSeconds(refreshRate);
         }
 
         _isTrailActive = false;
@@ -78,13 +84,47 @@ public class MeshTrailEffect : MonoBehaviour
 
     private IEnumerator AnimateMaterialFloat(Material mat, float goal, float rate, float refreshRate)
     {
+        if (mat == null) yield break;
         float valueToAnimate = mat.GetFloat(_shaderVarRef);
 
-        while(valueToAnimate > goal)
+        while(mat != null && valueToAnimate > goal)
         {
             valueToAnimate -= rate;
             mat.SetFloat(_shaderVarRef, valueToAnimate);
-            yield return new WaitForSeconds(refreshRate);
+            yield return WaitForEffectSeconds(refreshRate);
         }
+    }
+
+    private IEnumerator WaitForEffectSeconds(float seconds)
+    {
+        // Afterimages must not expire or finish emitting while the skill is frozen.
+        do
+        {
+            yield return null;
+            seconds -= EffectDeltaTime;
+        } while (seconds > 0f || EffectDeltaTime <= 0f);
+    }
+
+    private IEnumerator DestroyGhostAfter(GameObject ghost, float seconds)
+    {
+        yield return WaitForEffectSeconds(seconds);
+        _ghosts.Remove(ghost);
+        DestroyGhost(ghost);
+    }
+
+    private static void DestroyGhost(GameObject ghost)
+    {
+        if (ghost == null) return;
+        Destroy(ghost.GetComponent<MeshFilter>().sharedMesh);
+        Destroy(ghost.GetComponent<MeshRenderer>().sharedMaterial);
+        Destroy(ghost);
+    }
+
+    private void OnDisable()
+    {
+        StopAllCoroutines();
+        foreach (GameObject ghost in _ghosts) DestroyGhost(ghost);
+        _ghosts.Clear();
+        _isTrailActive = false;
     }
 }

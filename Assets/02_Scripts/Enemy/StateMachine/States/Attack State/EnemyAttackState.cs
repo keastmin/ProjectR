@@ -28,6 +28,8 @@ public abstract class EnemyAttackState : EnemyStateBase
 
     public override void UpdateTick()
     {
+        base.UpdateTick();
+
         if (_isDamaged)
             return;
 

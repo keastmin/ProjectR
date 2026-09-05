@@ -9,13 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 15c38f6fa1940124db1ab7f6fe7268d1, type: 3}
-  m_Name: Signal Emitter
-  m_EditorClassIdentifier: Unity.Timeline::UnityEngine.Timeline.SignalEmitter
+  m_Script: {fileID: 11500000, guid: d38b656966ae476da4108c5743e8a27c, type: 3}
+  m_Name: Skill Hit 5
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerSkillHitMarker
   m_Time: 0.7833333333333333
-  m_Retroactive: 0
-  m_EmitOnce: 0
-  m_Asset: {fileID: 0}
+  _damageFieldNumber: 5
 --- !u!114 &-9009543045035040487
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -72,22 +70,6 @@ MonoBehaviour:
   m_Retroactive: 0
   m_EmitOnce: 0
   m_Asset: {fileID: 11400000, guid: 2ed0b76ec15a33348b4a92c3bddf696c, type: 2}
---- !u!114 &-8206915865103490742
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 15c38f6fa1940124db1ab7f6fe7268d1, type: 3}
-  m_Name: Signal Emitter
-  m_EditorClassIdentifier: Unity.Timeline::UnityEngine.Timeline.SignalEmitter
-  m_Time: 0.9
-  m_Retroactive: 0
-  m_EmitOnce: 0
-  m_Asset: {fileID: 0}
 --- !u!114 &-7835628675783997331
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -237,22 +219,6 @@ MonoBehaviour:
   m_Retroactive: 0
   m_EmitOnce: 0
   m_Asset: {fileID: 11400000, guid: 532777d92af12294d986f3e326425721, type: 2}
---- !u!114 &-6078511880431325189
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 15c38f6fa1940124db1ab7f6fe7268d1, type: 3}
-  m_Name: Signal Emitter
-  m_EditorClassIdentifier: Unity.Timeline::UnityEngine.Timeline.SignalEmitter
-  m_Time: 0.8333333333333334
-  m_Retroactive: 0
-  m_EmitOnce: 0
-  m_Asset: {fileID: 0}
 --- !u!114 &-5618866529697863673
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -351,13 +317,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 15c38f6fa1940124db1ab7f6fe7268d1, type: 3}
-  m_Name: Signal Emitter
-  m_EditorClassIdentifier: Unity.Timeline::UnityEngine.Timeline.SignalEmitter
+  m_Script: {fileID: 11500000, guid: d38b656966ae476da4108c5743e8a27c, type: 3}
+  m_Name: Skill Hit 12
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerSkillHitMarker
   m_Time: 0.9166666666666666
-  m_Retroactive: 0
-  m_EmitOnce: 0
-  m_Asset: {fileID: 0}
+  _damageFieldNumber: 12
 --- !u!114 &-3445614312379179925
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -693,22 +657,6 @@ AnimationClip:
   m_HasGenericRootTransform: 1
   m_HasMotionFloatCurves: 0
   m_Events: []
---- !u!114 &-1371216329644390085
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 15c38f6fa1940124db1ab7f6fe7268d1, type: 3}
-  m_Name: Signal Emitter
-  m_EditorClassIdentifier: Unity.Timeline::UnityEngine.Timeline.SignalEmitter
-  m_Time: 0.7666666666666667
-  m_Retroactive: 0
-  m_EmitOnce: 0
-  m_Asset: {fileID: 0}
 --- !u!114 &-688655683679634356
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -718,13 +666,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 15c38f6fa1940124db1ab7f6fe7268d1, type: 3}
-  m_Name: Signal Emitter
-  m_EditorClassIdentifier: Unity.Timeline::UnityEngine.Timeline.SignalEmitter
+  m_Script: {fileID: 11500000, guid: d38b656966ae476da4108c5743e8a27c, type: 3}
+  m_Name: Skill Hit 9
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerSkillHitMarker
   m_Time: 0.85
-  m_Retroactive: 0
-  m_EmitOnce: 0
-  m_Asset: {fileID: 0}
+  _damageFieldNumber: 9
 --- !u!114 &-491869816618020384
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -841,22 +787,6 @@ MonoBehaviour:
   active: 1
   postPlayback: 2
   directorOnClipEnd: 0
---- !u!114 &-54657024289135162
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 15c38f6fa1940124db1ab7f6fe7268d1, type: 3}
-  m_Name: Signal Emitter
-  m_EditorClassIdentifier: Unity.Timeline::UnityEngine.Timeline.SignalEmitter
-  m_Time: 0.7333333333333333
-  m_Retroactive: 0
-  m_EmitOnce: 0
-  m_Asset: {fileID: 0}
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -948,13 +878,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 15c38f6fa1940124db1ab7f6fe7268d1, type: 3}
-  m_Name: Signal Emitter
-  m_EditorClassIdentifier: Unity.Timeline::UnityEngine.Timeline.SignalEmitter
-  m_Time: 0.9666666666666667
-  m_Retroactive: 0
-  m_EmitOnce: 0
-  m_Asset: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: d38b656966ae476da4108c5743e8a27c, type: 3}
+  m_Name: Skill Hit 12
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerSkillHitMarker
+  m_Time: 0.9833333333333333
+  _damageFieldNumber: 0
 --- !u!114 &1930528779749181613
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1147,9 +1075,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b46e36075dd1c124a8422c228e75e1fb, type: 3}
-  m_Name: Signal Track (2)
-  m_EditorClassIdentifier: Unity.Timeline::UnityEngine.Timeline.SignalTrack
+  m_Script: {fileID: 11500000, guid: 892f569439ae4ed0a75fa340ffd4bc63, type: 3}
+  m_Name: Skill Hits
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerSkillHitTrack
   m_Version: 3
   m_AnimClip: {fileID: 0}
   m_Locked: 0
@@ -1162,19 +1090,12 @@ MonoBehaviour:
   m_Markers:
     m_Objects:
     - {fileID: 3506469448566956908}
-    - {fileID: -54657024289135162}
     - {fileID: 8283880858342221565}
-    - {fileID: -1371216329644390085}
     - {fileID: -9167992346815788953}
-    - {fileID: 2950522574191957233}
     - {fileID: 2397549431169729650}
-    - {fileID: -6078511880431325189}
     - {fileID: -688655683679634356}
-    - {fileID: 6948787993382557009}
     - {fileID: 3552117505761550989}
-    - {fileID: -8206915865103490742}
     - {fileID: -3831970158797520698}
-    - {fileID: 6448212326290020409}
     - {fileID: 8463949906775439386}
     - {fileID: 827619042153716766}
 --- !u!114 &2226183087677655878
@@ -1210,13 +1131,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 15c38f6fa1940124db1ab7f6fe7268d1, type: 3}
-  m_Name: Signal Emitter
-  m_EditorClassIdentifier: Unity.Timeline::UnityEngine.Timeline.SignalEmitter
+  m_Script: {fileID: 11500000, guid: d38b656966ae476da4108c5743e8a27c, type: 3}
+  m_Name: Skill Hit 7
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerSkillHitMarker
   m_Time: 0.8166666666666667
-  m_Retroactive: 0
-  m_EmitOnce: 0
-  m_Asset: {fileID: 0}
+  _damageFieldNumber: 7
 --- !u!114 &2462644055841895446
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1325,22 +1244,6 @@ MonoBehaviour:
     m_DisplayName: Basic Attack 1 Slash (1)
   m_Markers:
     m_Objects: []
---- !u!114 &2950522574191957233
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 15c38f6fa1940124db1ab7f6fe7268d1, type: 3}
-  m_Name: Signal Emitter
-  m_EditorClassIdentifier: Unity.Timeline::UnityEngine.Timeline.SignalEmitter
-  m_Time: 0.8
-  m_Retroactive: 0
-  m_EmitOnce: 0
-  m_Asset: {fileID: 0}
 --- !u!114 &3184651521314550444
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1534,13 +1437,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 15c38f6fa1940124db1ab7f6fe7268d1, type: 3}
-  m_Name: Signal Emitter
-  m_EditorClassIdentifier: Unity.Timeline::UnityEngine.Timeline.SignalEmitter
+  m_Script: {fileID: 11500000, guid: d38b656966ae476da4108c5743e8a27c, type: 3}
+  m_Name: Skill Hit 1
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerSkillHitMarker
   m_Time: 0.7166666666666667
-  m_Retroactive: 0
-  m_EmitOnce: 0
-  m_Asset: {fileID: 0}
+  _damageFieldNumber: 0
 --- !u!114 &3552117505761550989
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1550,13 +1451,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 15c38f6fa1940124db1ab7f6fe7268d1, type: 3}
-  m_Name: Signal Emitter
-  m_EditorClassIdentifier: Unity.Timeline::UnityEngine.Timeline.SignalEmitter
+  m_Script: {fileID: 11500000, guid: d38b656966ae476da4108c5743e8a27c, type: 3}
+  m_Name: Skill Hit 11
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerSkillHitMarker
   m_Time: 0.8833333333333333
-  m_Retroactive: 0
-  m_EmitOnce: 0
-  m_Asset: {fileID: 0}
+  _damageFieldNumber: 11
 --- !u!114 &3706873495244894870
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -1873,38 +1772,6 @@ MonoBehaviour:
     m_DisplayName: Basic Attack 1 Slash (1)
   m_Markers:
     m_Objects: []
---- !u!114 &6448212326290020409
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 15c38f6fa1940124db1ab7f6fe7268d1, type: 3}
-  m_Name: Signal Emitter
-  m_EditorClassIdentifier: Unity.Timeline::UnityEngine.Timeline.SignalEmitter
-  m_Time: 0.9333333333333333
-  m_Retroactive: 0
-  m_EmitOnce: 0
-  m_Asset: {fileID: 0}
---- !u!114 &6948787993382557009
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 15c38f6fa1940124db1ab7f6fe7268d1, type: 3}
-  m_Name: Signal Emitter
-  m_EditorClassIdentifier: Unity.Timeline::UnityEngine.Timeline.SignalEmitter
-  m_Time: 0.8666666666666667
-  m_Retroactive: 0
-  m_EmitOnce: 0
-  m_Asset: {fileID: 0}
 --- !u!114 &7866287326458957016
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2085,13 +1952,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 15c38f6fa1940124db1ab7f6fe7268d1, type: 3}
-  m_Name: Signal Emitter
-  m_EditorClassIdentifier: Unity.Timeline::UnityEngine.Timeline.SignalEmitter
+  m_Script: {fileID: 11500000, guid: d38b656966ae476da4108c5743e8a27c, type: 3}
+  m_Name: Skill Hit 3
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerSkillHitMarker
   m_Time: 0.75
-  m_Retroactive: 0
-  m_EmitOnce: 0
-  m_Asset: {fileID: 0}
+  _damageFieldNumber: 3
 --- !u!114 &8463949906775439386
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2101,13 +1966,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 15c38f6fa1940124db1ab7f6fe7268d1, type: 3}
-  m_Name: Signal Emitter
-  m_EditorClassIdentifier: Unity.Timeline::UnityEngine.Timeline.SignalEmitter
+  m_Script: {fileID: 11500000, guid: d38b656966ae476da4108c5743e8a27c, type: 3}
+  m_Name: Skill Hit 12
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerSkillHitMarker
   m_Time: 0.95
-  m_Retroactive: 0
-  m_EmitOnce: 0
-  m_Asset: {fileID: 0}
+  _damageFieldNumber: 0
 --- !u!114 &8701240566491289618
 MonoBehaviour:
   m_ObjectHideFlags: 1

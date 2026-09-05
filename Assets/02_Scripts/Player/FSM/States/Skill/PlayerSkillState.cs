@@ -24,8 +24,7 @@ public class PlayerSkillState : PlayerStateBase
         Core.UseSkillGauge();
 
         // 타임라인 재생
-        _director.time = 0f;
-        _director.Play();
+        Core.DirectorContainer.Play(DirectorID.Skill);
 
         // 회전
         Collider target = Core.TargetDetector.AcquireBasicAttackTarget();
@@ -58,6 +57,14 @@ public class PlayerSkillState : PlayerStateBase
     public override void AnimatorTick()
     {
         AnimDeltaPos += Core.Animator.deltaPosition;
+    }
+
+    public override void OnHitStopStarted()
+    {
+        // Hit notifications arrive between animation and physics updates. Keep
+        // this frame's root motion, plus any movement awaiting a physics tick,
+        // so repeated skill hits pause the dash instead of deleting its distance.
+        AnimDeltaPos += Core.Mover.ConsumePendingDisplacement();
     }
 
     public override void Exit()

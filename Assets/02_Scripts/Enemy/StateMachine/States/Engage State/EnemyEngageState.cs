@@ -41,6 +41,8 @@ public class EnemyEngageState : EnemyCompositeState
 
     public override void UpdateTick()
     {
+        base.UpdateTick();
+
         if (_isDamaged)
             return;
 

@@ -22,6 +22,8 @@ public class EnemyIdleState : EnemyStateBase
 
     public override void UpdateTick()
     {
+        base.UpdateTick();
+
         if (_isDamaged)
             return;
 

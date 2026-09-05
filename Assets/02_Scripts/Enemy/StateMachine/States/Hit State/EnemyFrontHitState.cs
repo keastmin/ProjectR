@@ -36,6 +36,8 @@ public class EnemyFrontHitState : EnemyStateBase
 
     public override void UpdateTick()
     {
+        base.UpdateTick();
+
         if (_isDamaged)
             return;
 

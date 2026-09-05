@@ -87,9 +87,9 @@ public class PlayerStateMachine
         _currentState?.AnimatorTick();
     }
 
-    public void ClearAccumulatedMotion()
+    public void OnHitStopStarted()
     {
-        _currentState?.ClearAccumulatedMotion();
+        _currentState?.OnHitStopStarted();
     }
 
     public void Transition(PlayerStateBase nextState)

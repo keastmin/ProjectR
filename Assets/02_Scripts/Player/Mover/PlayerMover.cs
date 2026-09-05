@@ -1,7 +1,7 @@
-using TMPro;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody), typeof(CapsuleCollider))]
+[DefaultExecutionOrder(100)] // Consume the FSM's command in the same physics tick.
 public class PlayerMover : MonoBehaviour
 {
     private const float GroundProbeStartHeight = 1f;
@@ -25,6 +25,7 @@ public class PlayerMover : MonoBehaviour
     private Vector3 _inputVelocity = Vector3.zero;
     private bool _isHitStopped;
     private RigidbodyConstraints _constraintsBeforeHitStop;
+    private RigidbodyInterpolation _interpolationBeforeHitStop;
 
     #region MonoBehaviour
 
@@ -69,11 +70,23 @@ public class PlayerMover : MonoBehaviour
         _inputVelocity = velocity;
     }
 
+    // Transfer a command that has not reached the next physics tick yet.
+    public Vector3 ConsumePendingDisplacement()
+    {
+        Vector3 displacement = _inputVelocity * Time.fixedDeltaTime;
+        _inputVelocity = Vector3.zero;
+        return displacement;
+    }
+
     public void SetHitStopped(bool stopped)
     {
         if (_isHitStopped == stopped)
             return;
 
+        // Constraints can sync the interpolated render Transform back into
+        // PhysX. Preserve the completed physics step instead of rewinding it.
+        Vector3 position = _rigidbody.position;
+        Quaternion rotation = _rigidbody.rotation;
         _isHitStopped = stopped;
         _inputVelocity = Vector3.zero;
         _rigidbody.linearVelocity = Vector3.zero;
@@ -81,12 +94,18 @@ public class PlayerMover : MonoBehaviour
         if (stopped)
         {
             _constraintsBeforeHitStop = _rigidbody.constraints;
+            _interpolationBeforeHitStop = _rigidbody.interpolation;
+            _rigidbody.interpolation = RigidbodyInterpolation.None;
             _rigidbody.constraints = RigidbodyConstraints.FreezeAll;
         }
         else
         {
             _rigidbody.constraints = _constraintsBeforeHitStop;
+            _rigidbody.interpolation = _interpolationBeforeHitStop;
         }
+        _rigidbody.position = position;
+        _rigidbody.rotation = rotation;
+        transform.SetPositionAndRotation(position, rotation);
     }
 
     #endregion

@@ -16,16 +16,20 @@ public class EnemyHealthesUI : MonoBehaviour
     [SerializeField, Min(0f)] private float _disableFadeInDuration = 0.2f; // 투명해지는 시간
     [SerializeField, Min(0f)] private float _disableFadeOutDuration = 0.2f; // 다시 보이는 시간
     [SerializeField, Min(0f)] private float _damagedVisibleDuration = 3f; // 플레이어에게 피격된 뒤 표시를 유지하는 시간
+    [SerializeField, Min(0f)] private float _deadFadeOutDuration = 0.5f;
 
     private sealed class HealthBarState
     {
         public EnemyHealthBar HealthBar;
         public Action<DamageData> DamagedHandler;
+        public Action DeadHandler;
         public float OutOfRangeTime;
         public float DamagedVisibleTime;
+        public bool IsDead;
     }
 
     private Dictionary<EnemyCore, HealthBarState> _enemyHealthes;
+    private readonly List<EnemyCore> _healthBarsToRemove = new();
 
     private void Awake()
     {
@@ -44,7 +48,9 @@ public class EnemyHealthesUI : MonoBehaviour
                 HealthBar = healthBar
             };
             state.DamagedHandler = damageData => HandleEnemyDamaged(state, damageData);
+            state.DeadHandler = () => HandleEnemyDead(state);
             enemy.OnDamaged += state.DamagedHandler;
+            enemy.OnDead += state.DeadHandler;
             _enemyHealthes.Add(enemy, state);
         }
     }
@@ -64,6 +70,14 @@ public class EnemyHealthesUI : MonoBehaviour
             HealthBarState state = pair.Value;
             if (enemy == null || state.HealthBar == null)
                 continue;
+
+            if (state.IsDead)
+            {
+                if (state.HealthBar.Alpha <= 0f)
+                    _healthBarsToRemove.Add(enemy);
+
+                continue;
+            }
 
             state.DamagedVisibleTime = Mathf.Max(0f, state.DamagedVisibleTime - deltaTime);
 
@@ -86,6 +100,8 @@ public class EnemyHealthesUI : MonoBehaviour
                 : _disableFadeInDuration;
             state.HealthBar.SetAlpha(targetAlpha, fadeDuration);
         }
+
+        RemoveFadedHealthBars();
     }
 
     private void OnDestroy()
@@ -96,7 +112,10 @@ public class EnemyHealthesUI : MonoBehaviour
         foreach (KeyValuePair<EnemyCore, HealthBarState> pair in _enemyHealthes)
         {
             if (pair.Key != null)
+            {
                 pair.Key.OnDamaged -= pair.Value.DamagedHandler;
+                pair.Key.OnDead -= pair.Value.DeadHandler;
+            }
         }
     }
 
@@ -107,6 +126,31 @@ public class EnemyHealthesUI : MonoBehaviour
 
         state.DamagedVisibleTime = _damagedVisibleDuration;
         state.HealthBar.SetAlpha(1f, 0f);
+    }
+
+    private void HandleEnemyDead(HealthBarState state)
+    {
+        if (state.IsDead || state.HealthBar == null)
+            return;
+
+        state.IsDead = true;
+        state.HealthBar.SetAlpha(0f, _deadFadeOutDuration);
+    }
+
+    private void RemoveFadedHealthBars()
+    {
+        foreach (EnemyCore enemy in _healthBarsToRemove)
+        {
+            if (!_enemyHealthes.TryGetValue(enemy, out HealthBarState state))
+                continue;
+
+            enemy.OnDamaged -= state.DamagedHandler;
+            enemy.OnDead -= state.DeadHandler;
+            Destroy(state.HealthBar.gameObject);
+            _enemyHealthes.Remove(enemy);
+        }
+
+        _healthBarsToRemove.Clear();
     }
 
     private bool WasDamagedByPlayer(DamageData damageData)
@@ -126,5 +170,6 @@ public class EnemyHealthesUI : MonoBehaviour
         _disableFadeInDuration = Mathf.Max(0f, _disableFadeInDuration);
         _disableFadeOutDuration = Mathf.Max(0f, _disableFadeOutDuration);
         _damagedVisibleDuration = Mathf.Max(0f, _damagedVisibleDuration);
+        _deadFadeOutDuration = Mathf.Max(0f, _deadFadeOutDuration);
     }
 }

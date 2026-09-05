@@ -70,6 +70,11 @@ public class PlayerStateBase
         AnimDeltaPos = Vector3.zero;
     }
 
+    public virtual void OnHitStopStarted()
+    {
+        ClearAccumulatedMotion();
+    }
+
     protected void MoveRootMotionAlongFacingDirection()
     {
         Vector3 forward = Core.Rotator.FacingDirection;
