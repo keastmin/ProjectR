@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -22,6 +23,8 @@ public class PlayerAttackInstanceContainer : MonoBehaviour
     private readonly List<IHitStopParticipant> _hitStopVictims = new();
 
     private IHitStopParticipant _ownerHitStopParticipant;
+
+    public event Action<float> OnAttackSkillGaugeAdditive; // 타격에 의한 스킬 게이지 증가 이벤트
 
     private void Awake()
     {
@@ -149,6 +152,9 @@ public class PlayerAttackInstanceContainer : MonoBehaviour
                 damageField.StaggerLevel);
             if (!damageable.TryTakeDamage(data))
                 continue;
+
+            // 스킬 게이지 증가
+            OnAttackSkillGaugeAdditive?.Invoke(damageField.SkillGaugeAdditive);
 
             if (damageable is IHitStopParticipant participant)
                 _hitStopVictims.Add(participant);

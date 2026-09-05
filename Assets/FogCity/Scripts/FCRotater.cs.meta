@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: deacefef64d085a47aab773ec6544f65
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 321010
+  packageName: Fog City (MegaBundle) - cyberpunk
+  packageVersion: 1.0
+  assetPath: Assets/FogCity/Scripts/FCRotater.cs
+  uploadId: 758558

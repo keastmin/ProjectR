@@ -43,6 +43,12 @@ public class PlayerBackDodgeState : PlayerDodgeState
                 return;
             }
 
+            if (Core.InputCollector.IsInputSkill && Core.IsSkillEnable)
+            {
+                Core.StateMachine.Transition(Core.StateMachine.SkillState);
+                return;
+            }
+
             if (Core.InputCollector.IsInputAttack)
             {
                 Core.StateMachine.Transition(Core.StateMachine.BasicAttack1State);

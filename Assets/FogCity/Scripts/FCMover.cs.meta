@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 9186ac858b58fed4f8ac2bf385c91a38
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 321010
+  packageName: Fog City (MegaBundle) - cyberpunk
+  packageVersion: 1.0
+  assetPath: Assets/FogCity/Scripts/FCMover.cs
+  uploadId: 758558

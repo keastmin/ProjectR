@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 48229d415abfd104c8b9c291157afdc4
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 321010
+  packageName: Fog City (MegaBundle) - cyberpunk
+  packageVersion: 1.0
+  assetPath: Assets/FogCity/Prefab/Wall/base.prefab
+  uploadId: 758558

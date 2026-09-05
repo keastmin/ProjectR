@@ -3,6 +3,15 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class EnemyMover : MonoBehaviour
 {
+    private const float GroundProbeStartHeight = 1f;
+    private const float GroundProbeRadius = 0.1f;
+    private const float MaxHoverSpeed = 10f;
+
+    [Header("Ground Hover")]
+    [SerializeField] private LayerMask _groundLayerMask = 1 << 7;
+    [SerializeField][Min(0f)] private float _groundProbeExtraDistance = 2f;
+    [SerializeField][Min(0f)] private float _groundHoverSharpness = 20f;
+
     private Rigidbody _rigidbody;
 
     private Vector3 _inputVelocity = Vector3.zero;
@@ -15,6 +24,7 @@ public class EnemyMover : MonoBehaviour
         _rigidbody.freezeRotation = true;
         _rigidbody.interpolation = RigidbodyInterpolation.Interpolate;
         _rigidbody.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+        _rigidbody.useGravity = false;
     }
 
     private void FixedUpdate()
@@ -26,7 +36,7 @@ public class EnemyMover : MonoBehaviour
             return;
         }
 
-        _rigidbody.linearVelocity = _inputVelocity;
+        _rigidbody.linearVelocity = ApplyGroundHover(_inputVelocity);
         _inputVelocity = Vector3.zero;
     }
 
@@ -72,5 +82,23 @@ public class EnemyMover : MonoBehaviour
         {
             _rigidbody.constraints = _constraintsBeforeHitStop;
         }
+    }
+
+    private Vector3 ApplyGroundHover(Vector3 velocity)
+    {
+        Vector3 horizontalVelocity = Vector3.ProjectOnPlane(velocity, Vector3.up);
+        Vector3 probeOrigin = _rigidbody.position + Vector3.up * GroundProbeStartHeight;
+        float probeDistance = GroundProbeStartHeight + _groundProbeExtraDistance;
+
+        if (!Physics.SphereCast(probeOrigin, GroundProbeRadius, Vector3.down,
+                out RaycastHit groundHit, probeDistance, _groundLayerMask, QueryTriggerInteraction.Ignore) ||
+            groundHit.normal.y <= 0f)
+        {
+            return horizontalVelocity;
+        }
+
+        float heightError = Vector3.Dot(groundHit.point - _rigidbody.position, Vector3.up);
+        float hoverSpeed = Mathf.Clamp(heightError * _groundHoverSharpness, -MaxHoverSpeed, MaxHoverSpeed);
+        return horizontalVelocity + Vector3.up * hoverSpeed;
     }
 }

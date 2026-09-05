@@ -13,11 +13,13 @@ public class AttackDamageField
     private StaggerLevel _staggerLevel = StaggerLevel.None;
     [SerializeField] private LayerMask _targetLayers = ~0;
     [SerializeField] private QueryTriggerInteraction _triggerInteraction = QueryTriggerInteraction.Collide;
+    [SerializeField] private float _skillGaugeAdditive;
 
     public string Name => _name;
     public float Damage => _damage;
     public int HitStopFrame => _hitStopFrame;
     public StaggerLevel StaggerLevel => _staggerLevel;
+    public float SkillGaugeAdditive => _skillGaugeAdditive;
 
     public void DisablePhysicalCollision()
     {

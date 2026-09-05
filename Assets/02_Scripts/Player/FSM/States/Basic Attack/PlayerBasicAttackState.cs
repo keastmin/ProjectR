@@ -59,11 +59,21 @@ public abstract class PlayerBasicAttackState : PlayerStateBase
 
         if (_isOtherBehaviourEnable)
         {
-            if (Core.InputCollector.IsInputAttack)
+            if(Core.InputCollector.IsInputSkill && Core.IsSkillEnable)
+            {
+                Core.StateMachine.Transition(Core.StateMachine.SkillState);
+                return;
+            }
+            else if (Core.InputCollector.IsInputAttack)
+            {
                 Core.StateMachine.Transition(Core.StateMachine.BasicAttack1State);
+                return;
+            }
             else if (Core.InputCollector.IsInputMove)
+            {
                 Core.StateMachine.Transition(Core.StateMachine.RunStartState);
-            return;
+                return;
+            }
         }
 
         if (stateInfo.normalizedTime >= 0.92f)

@@ -55,6 +55,12 @@ public class PlayerRunAttackState : PlayerStateBase
         // 다른 행동 가능 플래그가 활성화 되면 공격이나 이동으로 전환
         if (_isEnableOtherBehaviour)
         {
+            if (Core.InputCollector.IsInputSkill && Core.IsSkillEnable)
+            {
+                Core.StateMachine.Transition(Core.StateMachine.SkillState);
+                return;
+            }
+
             if (Core.InputCollector.IsInputAttack)
             {
                 Core.StateMachine.Transition(Core.StateMachine.BasicAttack1State);

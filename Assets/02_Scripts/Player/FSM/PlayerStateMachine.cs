@@ -24,6 +24,7 @@ public class PlayerStateMachine
     public PlayerDodgeAttackStartState DodgeAttackStartState;
     public PlayerDodgeAttackLoopState DodgeAttackLoopState;
     public PlayerDodgeAttackEndState DodgeAttackEndState;
+    public PlayerSkillState SkillState;
 
     private PlayerStateBase _currentState;
     private readonly PlayerCore _core;
@@ -57,6 +58,7 @@ public class PlayerStateMachine
         DodgeAttackStartState = new PlayerDodgeAttackStartState(player);
         DodgeAttackLoopState = new PlayerDodgeAttackLoopState(player);
         DodgeAttackEndState = new PlayerDodgeAttackEndState(player);
+        SkillState = new PlayerSkillState(player);
     }
 
     public void InitStateMachine(PlayerStateBase initState)

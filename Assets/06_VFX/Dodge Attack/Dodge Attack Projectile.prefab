@@ -4906,6 +4906,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ProjectileHitbox
   _damage: 2
+  _skillGaugeAdditive: 0.2
   _damageInterval: 0.2
   _hitStopFrame: 1
   _staggerLevel: 2

@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 3d40ca7df8271aa4bbcf8cfb075d737b
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 321010
+  packageName: Fog City (MegaBundle) - cyberpunk
+  packageVersion: 1.0
+  assetPath: Assets/FogCity/Scripts/FCVibro.cs
+  uploadId: 758558

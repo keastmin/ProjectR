@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: ddab7e00e97c47044a51bf1a408b74d9
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 321010
+  packageName: Fog City (MegaBundle) - cyberpunk
+  packageVersion: 1.0
+  assetPath: Assets/FogCity/Scripts/FCTrackControl.cs
+  uploadId: 758558

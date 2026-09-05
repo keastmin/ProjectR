@@ -6,9 +6,17 @@ using static UnityEngine.Splines.SplineInstantiate;
 public class MeshTrailEffect : MonoBehaviour
 {
     [SerializeField] private PlayerRotator _rotator;
-    [SerializeField] private float _activeTime = 2f;
-    [SerializeField] private float _meshRefreshRate = 0.1f;
-    [SerializeField] private float _meshDestroyDelay = 3f;
+
+    [Header("Dodge Effect")]
+    [SerializeField] private float _dodgeActiveTime = 1.4f;
+    [SerializeField] private float _dodgeMeshRefreshRate = 0.2f;
+    [SerializeField] private float _dodgeMeshDestroyDelay = 1f;
+
+    [Header("Skill Effect")]
+    [SerializeField] private float _skillActiveTime = 0.27f;
+    [SerializeField] private float _skillMeshRefreshRate = 0.1f;
+    [SerializeField] private float _skillMeshDestroyDelay = 2f;
+
     [SerializeField] private SkinnedMeshRenderer[] _skinnedMeshRenderers;
 
     [Header("Shader Related")]
@@ -24,15 +32,24 @@ public class MeshTrailEffect : MonoBehaviour
         if (!_isTrailActive && _skinnedMeshRenderers != null)
         {
             _isTrailActive = true;
-            StartCoroutine(ActiveTrail(_activeTime));
+            StartCoroutine(ActiveTrail(_dodgeActiveTime, _dodgeMeshRefreshRate, _dodgeMeshDestroyDelay));
         }
     }
 
-    private IEnumerator ActiveTrail(float timeActive)
+    public void ActiveSkillEffect()
+    {
+        if(!_isTrailActive && _skinnedMeshRenderers != null)
+        {
+            _isTrailActive = true;
+            StartCoroutine(ActiveTrail(_skillActiveTime, _skillMeshRefreshRate, _skillMeshDestroyDelay));
+        }
+    }
+
+    private IEnumerator ActiveTrail(float timeActive, float refreshRate, float destroyDelay)
     {
         while (timeActive > 0)
         {
-            timeActive -= _meshRefreshRate;
+            timeActive -= refreshRate;
 
             for (int i = 0; i < _skinnedMeshRenderers.Length; i++) {
 
@@ -51,9 +68,9 @@ public class MeshTrailEffect : MonoBehaviour
 
                 StartCoroutine(AnimateMaterialFloat(mr.material, 0, _shaderVarRate, _shaderVarRefreshRate));
 
-                Destroy(gObj, _meshDestroyDelay);
+                Destroy(gObj, destroyDelay);
             } 
-            yield return new WaitForSeconds(_meshRefreshRate);
+            yield return new WaitForSeconds(refreshRate);
         }
 
         _isTrailActive = false;

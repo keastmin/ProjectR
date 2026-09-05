@@ -7,6 +7,8 @@ public class ProjectileHitbox : MonoBehaviour
 {
     [Header("Periodic Damage (Play Mode Only)")]
     [SerializeField, Min(0f)] private float _damage = 10f;
+    [SerializeField, Min(0f), Tooltip("적에게 피해를 줄 때마다 증가하는 스킬 게이지입니다.")]
+    private float _skillGaugeAdditive = 0.2f;
     [SerializeField, Min(0.01f), Tooltip("전투 시간 기준 검사 간격입니다. 첫 검사는 생성 후 이 시간이 지난 뒤 실행됩니다.")]
     private float _damageInterval = 0.2f;
     [SerializeField, Min(0), Tooltip("피해를 받은 적만 이 값 + 1프레임 정지합니다. 0이면 히트스탑을 요청하지 않습니다.")]
@@ -38,6 +40,7 @@ public class ProjectileHitbox : MonoBehaviour
     private Mesh _bakedMesh;
     private Camera _fallbackBakeCamera;
     private GameObject _owner;
+    private PlayerCore _skillGaugeOwner;
     private float _tickElapsed;
     private bool _refreshSources = true;
 
@@ -49,6 +52,7 @@ public class ProjectileHitbox : MonoBehaviour
     public void Initialize(GameObject owner)
     {
         _owner = owner;
+        _skillGaugeOwner = owner != null ? owner.GetComponentInParent<PlayerCore>() : null;
         _tickElapsed = 0f;
         _targetsInCurrentTick.Clear();
         _hitStopVictims.Clear();
@@ -88,6 +92,7 @@ public class ProjectileHitbox : MonoBehaviour
             ReleaseTemporaryObject(_fallbackBakeCamera.gameObject);
         _fallbackBakeCamera = null;
         _owner = null;
+        _skillGaugeOwner = null;
         _tickElapsed = 0f;
         _targetsInCurrentTick.Clear();
         _hitStopVictims.Clear();
@@ -162,8 +167,12 @@ public class ProjectileHitbox : MonoBehaviour
             EnemyCore enemy = hit.GetComponentInParent<EnemyCore>();
             if (enemy == null || !enemy.isActiveAndEnabled || !_targetsInCurrentTick.Add(enemy))
                 continue;
-            if (enemy.TryTakeDamage(damageData))
-                _hitStopVictims.Add(enemy);
+            if (!enemy.TryTakeDamage(damageData))
+                continue;
+
+            _hitStopVictims.Add(enemy);
+            if (_skillGaugeOwner != null && _skillGaugeAdditive > 0f)
+                _skillGaugeOwner.AddSkillGauge(_skillGaugeAdditive);
         }
 
         HitstopCoordinator.RequestVictimsOnly(_hitStopVictims, _hitStopFrame);

@@ -7,22 +7,26 @@ public class PlayerInputCollector : MonoBehaviour
     private string _moveName = "Move";
     private string _attackName = "Attack";
     private string _dodgeName = "Dodge";
+    private string _skillName = "Skill";
 
     private PlayerInput _playerInput;
 
     private InputAction _moveAction;
     private InputAction _attackAction;
     private InputAction _dodgeAction;
+    private InputAction _skillAction;
 
     private Vector2 _moveValue = Vector2.zero;
     private bool _attackValue = false;
     private bool _dodgeValue = false;
+    private bool _skillValue = false;
 
     // 프로퍼티
     public Vector2 MoveValue => _moveValue;
     public bool IsInputMove => MoveValue.sqrMagnitude >= 0.001f;
     public bool IsInputAttack => _attackValue;
     public bool IsInputDodge => _dodgeValue;
+    public bool IsInputSkill => _skillValue;
 
     private void Awake()
     {
@@ -30,6 +34,7 @@ public class PlayerInputCollector : MonoBehaviour
         _moveAction = _playerInput.actions[_moveName];
         _attackAction = _playerInput.actions[_attackName];
         _dodgeAction = _playerInput.actions[_dodgeName];
+        _skillAction = _playerInput.actions[_skillName];
     }
 
     private void Update()
@@ -42,5 +47,8 @@ public class PlayerInputCollector : MonoBehaviour
 
         // 회피 입력 감지
         _dodgeValue = _dodgeAction.WasPressedThisFrame();
+
+        // 스킬 입력 감지
+        _skillValue = _skillAction.WasPressedThisFrame();
     }
 }

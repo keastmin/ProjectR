@@ -4,10 +4,20 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody), typeof(CapsuleCollider))]
 public class PlayerMover : MonoBehaviour
 {
+    private const float GroundProbeStartHeight = 1f;
+    private const float GroundProbeRadius = 0.1f;
+    private const float MaxHoverSpeed = 10f;
+
+    [Header("Collider")]
     [SerializeField] private float _height = 2f;
     [SerializeField] private float _thickness = 1f;
     [SerializeField] private Vector3 _offset = Vector3.zero;
     [SerializeField] private float _stepHeight = 0.3f;
+
+    [Header("Ground Hover")]
+    [SerializeField] private LayerMask _groundLayerMask = 1 << 7;
+    [SerializeField][Min(0f)] private float _groundProbeExtraDistance = 2f;
+    [SerializeField][Min(0f)] private float _groundHoverSharpness = 20f;
 
     private Rigidbody _rigidbody;
     private CapsuleCollider _capsuleCollider;
@@ -38,7 +48,7 @@ public class PlayerMover : MonoBehaviour
             return;
         }
 
-        ApplyVelocity(_inputVelocity);
+        ApplyVelocity(ApplyGroundHover(_inputVelocity));
         UpdateCleanup();
     }
 
@@ -126,6 +136,24 @@ public class PlayerMover : MonoBehaviour
     private void ApplyVelocity(Vector3 velocity)
     {
         _rigidbody.linearVelocity = velocity;
+    }
+
+    private Vector3 ApplyGroundHover(Vector3 velocity)
+    {
+        Vector3 horizontalVelocity = Vector3.ProjectOnPlane(velocity, Vector3.up);
+        Vector3 probeOrigin = _rigidbody.position + Vector3.up * GroundProbeStartHeight;
+        float probeDistance = GroundProbeStartHeight + _groundProbeExtraDistance;
+
+        if (!Physics.SphereCast(probeOrigin, GroundProbeRadius, Vector3.down,
+                out RaycastHit groundHit, probeDistance, _groundLayerMask, QueryTriggerInteraction.Ignore) ||
+            groundHit.normal.y <= 0f)
+        {
+            return horizontalVelocity;
+        }
+
+        float heightError = Vector3.Dot(groundHit.point - _rigidbody.position, Vector3.up);
+        float hoverSpeed = Mathf.Clamp(heightError * _groundHoverSharpness, -MaxHoverSpeed, MaxHoverSpeed);
+        return horizontalVelocity + Vector3.up * hoverSpeed;
     }
 
     private void UpdateCleanup()

@@ -3,6 +3,9 @@ using UnityEngine;
 
 public class PlayerAnimationEvent : MonoBehaviour
 {
+    [SerializeField] private Animator _animator;
+    [SerializeField] private MeshTrailEffect _trailEffect;
+    [SerializeField] private ParticleSystem _skillSlashEffect;
     [SerializeField] private Transform _leftFootDashTransform;
     [SerializeField] private Transform _rightFootDashTransform;
     [SerializeField] private ParticleSystem _dashExplosionParticle;
@@ -118,5 +121,27 @@ public class PlayerAnimationEvent : MonoBehaviour
     private void CreateEffect(Vector3 position, Quaternion rotation, ParticleSystem particle)
     {
         Instantiate(particle, position, rotation);
+    }
+
+    public void OnIdleAnimationTransition()
+    {
+        _animator.CrossFade("Base Layer.Idle", 0f, 0);
+        foreach(var parameter in _animator.parameters)
+        {
+            if(parameter.type == AnimatorControllerParameterType.Trigger)
+            {
+                _animator.ResetTrigger(parameter.nameHash);
+            }
+        }
+    }
+
+    public void OnActiveTrailEffect()
+    {
+        _trailEffect.ActiveSkillEffect();
+    }
+
+    public void OnSkillSlash(Transform slashPos)
+    {
+        var skillSlash = Instantiate(_skillSlashEffect, slashPos.position, slashPos.rotation);
     }
 }

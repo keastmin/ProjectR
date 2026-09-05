@@ -36,6 +36,12 @@ public class PlayerRunStopLeftState : PlayerStateBase
             return;
         }
 
+        if (Core.InputCollector.IsInputSkill && Core.IsSkillEnable)
+        {
+            Core.StateMachine.Transition(Core.StateMachine.SkillState);
+            return;
+        }
+
         // 기본 공격 입력이 있다면 기본 공격 상태로 전환
         if (Core.InputCollector.IsInputAttack)
         {

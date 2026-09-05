@@ -7,5 +7,6 @@ public enum DirectorID
     RunAttack,
     DodgeAttackStart,
     DodgeAttackLoop,
-    DodgeAttackEnd
+    DodgeAttackEnd,
+    Skill
 }

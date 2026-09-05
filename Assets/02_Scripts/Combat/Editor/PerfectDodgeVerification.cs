@@ -95,6 +95,8 @@ public static class PerfectDodgeVerification
         Check(player != null && player.StateMachine != null && enemy != null, "Scene actors initialize");
         var settings = Field<PerfectDodgeSettings>(player, "_perfectDodge");
         settings.SlowScale = 0.35f;
+        settings.StartDelay = 0f;
+        settings.MaxDuration = 10f;
         settings.FadeInDuration = 0f;
         settings.FadeOutDuration = 0f;
         float originalTimeScale = Time.timeScale;
@@ -102,6 +104,8 @@ public static class PerfectDodgeVerification
         float enemyBaseSpeed = enemy.Animator.speed;
         var oldCheck = player.OnPerfectDodgeCheck;
         player.OnPerfectDodgeCheck = () => enemy;
+
+        ValidateDelayedStart(player, enemy, settings);
 
         player.StateMachine.Transition(player.StateMachine.FrontDodgeState);
         Check(player.IsPerfectDodgeWindowOpen && player.PerfectDodgeSource == enemy, "Dodge opens target window");
@@ -189,6 +193,36 @@ public static class PerfectDodgeVerification
         player.enabled = false;
         Near(CombatTimeController.Scale, 1f, "Player disable cleans up slow motion");
         player.OnPerfectDodgeCheck = oldCheck;
+    }
+
+    private static void ValidateDelayedStart(PlayerCore player, EnemyCore enemy, PerfectDodgeSettings settings)
+    {
+        settings.StartDelay = 0.1f;
+        settings.MaxDuration = 0.2f;
+        player.BeginPerfectDodge(enemy);
+        Check(player.IsPerfectDodgeActive && player.IsInvulnerable,
+            "Perfect dodge protects immediately before slow motion");
+        Check(!player.TryTakeDamage(new DamageData(enemy.gameObject, 1f, 0)),
+            "Delayed slow motion does not delay damage immunity");
+        Check(!player.IsPerfectDodgeWindowOpen && !player.TryBeginDodgeAttack(),
+            "Counterattack stays closed during the presentation delay");
+        Near(CombatTimeController.Scale, 1f, "Presentation delay leaves combat at normal speed");
+
+        TickPerfectDodge(player, 0.099f);
+        Check(!player.IsPerfectDodgeWindowOpen, "Window stays closed until the full delay elapses");
+        TickPerfectDodge(player, 0.002f);
+        Check(player.IsPerfectDodgeWindowOpen, "Delay completion opens the counterattack window");
+        Near(CombatTimeController.Scale, settings.SlowScale, "Delay completion starts slow motion");
+
+        TickPerfectDodge(player, 0.19f);
+        Check(player.IsPerfectDodgeWindowOpen, "Window stays open during its configured duration");
+        TickPerfectDodge(player, 0.02f);
+        Check(!player.IsPerfectDodgeActive && !player.IsPerfectDodgeWindowOpen,
+            "Maximum duration closes protection and counterattack window");
+        Near(CombatTimeController.Scale, 1f, "Maximum duration releases slow motion");
+
+        settings.StartDelay = 0f;
+        settings.MaxDuration = 10f;
     }
 
     private static void ValidateInvulnerability(PlayerCore player, EnemyCore enemy, PerfectDodgeSettings settings)
@@ -297,6 +331,9 @@ public static class PerfectDodgeVerification
     }
 
     private static PlayerStateBase CurrentState(PlayerCore player) => Field<PlayerStateBase>(player.StateMachine, "_currentState");
+    private static void TickPerfectDodge(PlayerCore player, float realDeltaTime) =>
+        typeof(PlayerCore).GetMethod("TickPerfectDodge", BindingFlags.Instance | BindingFlags.NonPublic)
+            .Invoke(player, new object[] { realDeltaTime });
     private static void UpdateGameInput()
     {
         // The public no-argument update selects Editor input when a headless Game view has no focus.

@@ -50,7 +50,7 @@ public abstract class PlayerDodgeState : PlayerStateBase
     {
         Core.AnimationEvent.OnPerfectDodgeEnd -= HandlePerfectDodgeEnd;
         // 자연 종료 후 진행 중인 FadeOut은 유지하고, 도중에 다른 상태로 나가면 정리합니다.
-        if (Core.IsPerfectDodgeWindowOpen)
+        if (Core.IsPerfectDodgeActive)
             Core.EndPerfectDodge(true);
         // 초기화
         IsPerfectDodge = false;
